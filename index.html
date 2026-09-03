@@ -124,8 +124,29 @@
                     <div><strong>Información del objeto</strong><p>Completa los datos principales.</p></div>
                 </div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Estado inicial</label><select id="objectType"><option value="Perdido">Perdido</option><option value="Encontrado">Encontrado</option></select></div>
-                    <div class="form-group"><label>Nombre del objeto</label><input id="objectName" type="text" placeholder="Ej. Estuche negro" required></div>
+                    <div class="form-group">
+                        <label>Estado inicial</label>
+                        <select id="objectStatus">
+                            <option value="Perdido">Perdido</option>
+                            <option value="Encontrado">Encontrado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de objeto</label>
+                        <select id="objectCategory" required>
+                            <option value="">Selecciona un tipo</option>
+                            <option value="Prendas">Prendas</option>
+                            <option value="Dispositivos electrónicos">Dispositivos electrónicos</option>
+                            <option value="Útiles escolares">Útiles escolares</option>
+                            <option value="Objetos personales">Objetos personales</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Nombre del objeto</label>
+                        <select id="objectName" required disabled>
+                            <option value="">Primero selecciona un tipo de objeto</option>
+                        </select>
+                    </div>
                     <div class="form-group full"><label>Descripción</label><textarea id="objectDescription" placeholder="Describe características que permitan identificarlo..." required></textarea></div>
                 </div>
                 <div class="form-section-title second">
@@ -134,7 +155,22 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group"><label>Fecha</label><input id="objectDate" type="date" required></div>
-                    <div class="form-group"><label>Lugar</label><input id="objectPlace" type="text" placeholder="Ej. Aula 6A" required></div>
+                    <div class="form-group">
+                        <label>Lugar</label>
+                        <select id="objectPlace" required>
+                            <option value="">Selecciona un lugar</option>
+                            <option value="Curso">Curso</option>
+                            <option value="Patio">Patio</option>
+                            <option value="Pasillos">Pasillos</option>
+                            <option value="Baños">Baños</option>
+                            <option value="Cancha de secundaria">Cancha de secundaria</option>
+                            <option value="Kioscos">Kioscos</option>
+                            <option value="Teatro">Teatro</option>
+                            <option value="Coliseo">Coliseo</option>
+                            <option value="Templo">Templo</option>
+                            <option value="Canchas de primaria">Canchas de primaria</option>
+                        </select>
+                    </div>
                     <div class="form-group"><label>Estudiante <small>(opcional)</small></label><input id="studentName" type="text" placeholder="Nombre del estudiante"></div>
                     <div class="form-group"><label>Fotografía <small>(opcional)</small></label><input id="objectImage" type="file" accept="image/*"></div>
                 </div>
