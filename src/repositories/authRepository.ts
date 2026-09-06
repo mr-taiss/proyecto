@@ -15,7 +15,6 @@ export const authRepository = {
     const sessionUser: User = {
       id: `usuario-${nombreAutorizado}`,
       name: nombreAutorizado,
-      carnet: "",
       role: "USUARIO",
     };
 
