@@ -12,14 +12,9 @@
       document.body.appendChild(box);
       document.getElementById("sisgopLoginForm").addEventListener("submit", function (event) {
         event.preventDefault();
-        if (typeof window.loginSISGOP === "function") {
-          window.loginSISGOP();
-        } else {
-          document.getElementById("sisgopLoginMessage").textContent = "No se pudo cargar el sistema de acceso. Recarga la página.";
-        }
+        if (typeof window.loginSISGOP === "function") window.loginSISGOP();
       });
     }
-
     box.style.display = "flex";
     document.querySelectorAll(".page").forEach(function (page) { page.classList.remove("active"); });
     document.getElementById("sisgopLoginUser").value = "";
@@ -30,4 +25,14 @@
 
   window.enterSystem = openLogin;
   window.showSISGOPLogin = openLogin;
+
+  // Bloquea el onclick antiguo de la portada que abría el panel directamente.
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest && event.target.closest(".backpack-entry");
+    if (button) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openLogin();
+    }
+  }, true);
 })();
