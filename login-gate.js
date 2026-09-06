@@ -23,10 +23,25 @@
     document.getElementById("sisgopLoginUser").focus();
   }
 
-  window.enterSystem = openLogin;
-  window.showSISGOPLogin = openLogin;
+  function enforceGate() {
+    window.enterSystem = openLogin;
+    window.showSISGOPLogin = openLogin;
+    const button = document.querySelector(".backpack-entry");
+    if (button) {
+      button.onclick = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openLogin();
+      };
+    }
+  }
 
-  // Bloquea el onclick antiguo de la portada que abría el panel directamente.
+  enforceGate();
+  document.addEventListener("DOMContentLoaded", enforceGate);
+  setTimeout(enforceGate, 0);
+  setTimeout(enforceGate, 250);
+
+  // Bloquea cualquier onclick antiguo de la portada que intente abrir el panel directamente.
   document.addEventListener("click", function (event) {
     const button = event.target.closest && event.target.closest(".backpack-entry");
     if (button) {
