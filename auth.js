@@ -77,7 +77,8 @@
     badge.innerHTML = `<strong>${user.name}</strong> <button onclick="changePasswordSISGOP()" style="margin-left:8px;border:0;background:transparent;color:#245ea8;cursor:pointer">Cambiar contraseña</button><button onclick="logoutSISGOP()" style="margin-left:8px;border:0;background:transparent;color:#b44b4b;cursor:pointer">Salir</button>`;
   }
 
-  window.enterSystem = function () { if (currentUser()) { if (!hasChangedPassword(currentUser())) showChangePassword(true); else { window.openHome(); updateUserBadge(); } } else showLogin(); };
+  // Al entrar desde la portada siempre se solicita el login. La sesión guardada no salta esta pantalla.
+  window.enterSystem = function () { localStorage.removeItem(SESSION_KEY); showLogin(); };
   window.loginSISGOP = login; window.logoutSISGOP = logout; window.currentSISGOPUser = currentUser; window.changePasswordSISGOP = () => showChangePassword(false);
   window.__SISGOP_AUTH_READY = true;
 
