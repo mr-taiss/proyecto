@@ -9,12 +9,53 @@ const OBJECT_OPTIONS={
   "Objetos personales":["Billetera","Llaves","Lentes","Botella","Paraguas","Reloj","Accesorio","Documento personal"]
 };
 
+const AUTHORIZED_STUDENTS=[
+  "PEREYRA MARIA RENE",
+  "ACUÑA BARRIOS DIANA CAMILA",
+  "AGRADA LEZANO JHANA FABIANE",
+  "ANIBARRO MONTELLANO MATEO GAEL",
+  "APARICIO NAVIA MARIA FERNANDA",
+  "ARANCIBIA LLUEN SAMANTA GUADALUPE",
+  "AYLLON TELLEZ GABRIELA BELEN",
+  "BARRIGA VILLCA LIZETH",
+  "BUEZO VALDA MARCELO BENJAMIN",
+  "CESPEDES ARANCIBIA FABIO EMMANUEL",
+  "CHAMBI ESPINOZA ARIANA AYLIN",
+  "CIVERA LOZADA HENRRY MAURICIO",
+  "COA LOAYZA NATALIA",
+  "COTRINO CHABARRIA ANGELA NATALY",
+  "DAZA BARRIENTOS CAMILA DE LOS ANGELES",
+  "DAZA MANCILLA ANA EMILIA",
+  "DELGADO COPA NATALIA ANDREA",
+  "GEMIO FERNANDEZ DIANA BRENDA",
+  "GONZALES PANIAGUA DYLAN JEREMY",
+  "JESUS SANABRIA IGNACIO ANTONIO",
+  "MALDONADO RAMIREZ ANELID ESTHER",
+  "MARIN CERVANTES GISSEL PAOLA",
+  "MENDEZ CARRASCO IVAN BENIGNO",
+  "MONTOYA RAMOS KAMILAH TAIS",
+  "OBLITAS CORONADO JUAN SAMUEL",
+  "ORTUSTE URQUIZU ANA CECILIA",
+  "PARADA GONZALES MARIANA",
+  "PEREZ FLORES CARLOS FABIAN",
+  "RAMIREZ SIÑANI HUGO JOSE MANUEL",
+  "ROCHA LOPEZ ALEJANDRA EDITH",
+  "RODRIGUEZ APARICIO SAMANTA",
+  "SERRUDO ORTIZ SAMANTA VIOLETA",
+  "TEJERINA PACO JUDITH AMAYA",
+  "VEDIA DURAN ANTHON SEBASTIAN",
+  "VEGA VALDEZ IKER HOLZEN",
+  "VILLEGAS ARANCIBIA CAMILA RENATA",
+  "ZARCILLO ROJAS ANGELA MARIELA"
+];
+
 document.addEventListener("DOMContentLoaded",()=>{
   loadObjects();
   setToday();
   setupForm();
   setupImagePreview();
   setupObjectSelectors();
+  setupStudentRecognition();
   updateAll();
   showScreen("welcomeScreen");
 });
@@ -72,6 +113,33 @@ function findCategoryByName(name){
   return "";
 }
 
+function normalizeStudentName(value){
+  return String(value||"").trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ");
+}
+
+function recognizeStudent(value){
+  const normalized=normalizeStudentName(value);
+  if(!normalized)return null;
+  return AUTHORIZED_STUDENTS.find(name=>normalizeStudentName(name)===normalized)||null;
+}
+
+function setupStudentRecognition(){
+  const input=document.getElementById("studentName");
+  if(!input)return;
+  input.addEventListener("blur",()=>{
+    const recognized=recognizeStudent(input.value);
+    if(recognized){
+      input.value=recognized;
+      input.setCustomValidity("");
+    }else if(input.value.trim()){
+      input.setCustomValidity("Escribe el nombre de un estudiante registrado.");
+    }else{
+      input.setCustomValidity("");
+    }
+  });
+  input.addEventListener("input",()=>input.setCustomValidity(""));
+}
+
 function resetForm(){
   const f=document.getElementById("objectForm");
   f.reset();
@@ -83,6 +151,8 @@ function resetForm(){
   p.innerHTML="";
   p.classList.remove("visible");
   setToday();
+  const student=document.getElementById("studentName");
+  if(student)student.setCustomValidity("");
 }
 
 function setupImagePreview(){
@@ -110,12 +180,24 @@ function saveObject(e){
   const description=document.getElementById("objectDescription").value.trim();
   const date=document.getElementById("objectDate").value;
   const place=document.getElementById("objectPlace").value;
-  const student=document.getElementById("studentName").value.trim();
+  const studentInput=document.getElementById("studentName");
+  const recognizedStudent=recognizeStudent(studentInput.value);
+  const student=recognizedStudent||studentInput.value.trim();
 
   if(!status||!category||!name||!description||!date||!place){
     showToast("Completa todos los campos obligatorios.","error");
     return;
   }
+
+  if(studentInput.value.trim()&&!recognizedStudent){
+    studentInput.setCustomValidity("Escribe el nombre de un estudiante registrado.");
+    studentInput.reportValidity();
+    showToast("El estudiante no está registrado.","error");
+    return;
+  }
+
+  studentInput.value=student;
+  studentInput.setCustomValidity("");
 
   if(editingId!==null){
     const o=objects.find(x=>x.id===editingId);
@@ -182,6 +264,7 @@ function editObject(id){
   document.getElementById("objectDate").value=o.date;
   document.getElementById("objectPlace").value=o.place;
   document.getElementById("studentName").value=o.student||"";
+  document.getElementById("studentName").setCustomValidity("");
   currentImage=o.image||"";
   if(o.image){const p=document.getElementById("imagePreview");p.innerHTML=`<img src="${o.image}" alt="Objeto">`;p.classList.add("visible")}
   showScreen("registerScreen");
