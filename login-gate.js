@@ -1,5 +1,9 @@
 /* SISGOP - puerta de acceso obligatoria */
 (function () {
+  function hasSession() {
+    return !!localStorage.getItem("sisgop_current_user");
+  }
+
   function openLogin() {
     localStorage.removeItem("sisgop_current_user");
 
@@ -23,9 +27,29 @@
     document.getElementById("sisgopLoginUser").focus();
   }
 
+  function guardHome() {
+    if (!hasSession()) {
+      document.querySelectorAll(".page").forEach(function (page) { page.classList.remove("active"); });
+      openLogin();
+      return false;
+    }
+    return true;
+  }
+
   function enforceGate() {
     window.enterSystem = openLogin;
     window.showSISGOPLogin = openLogin;
+
+    const originalOpenHome = window.openHome;
+    if (typeof originalOpenHome === "function" && !originalOpenHome.__sisgopGuarded) {
+      const guardedOpenHome = function () {
+        if (!guardHome()) return;
+        return originalOpenHome.apply(this, arguments);
+      };
+      guardedOpenHome.__sisgopGuarded = true;
+      window.openHome = guardedOpenHome;
+    }
+
     const button = document.querySelector(".backpack-entry");
     if (button) {
       button.onclick = function (event) {
@@ -34,20 +58,50 @@
         openLogin();
       };
     }
+
+    if (!hasSession()) {
+      const home = document.getElementById("homeScreen");
+      if (home) home.classList.remove("active");
+    }
   }
 
   enforceGate();
   document.addEventListener("DOMContentLoaded", enforceGate);
   setTimeout(enforceGate, 0);
   setTimeout(enforceGate, 250);
+  setTimeout(enforceGate, 1000);
 
-  // Bloquea cualquier onclick antiguo de la portada que intente abrir el panel directamente.
   document.addEventListener("click", function (event) {
     const button = event.target.closest && event.target.closest(".backpack-entry");
     if (button) {
       event.preventDefault();
       event.stopImmediatePropagation();
       openLogin();
+      return;
+    }
+
+    const homeTarget = event.target.closest && event.target.closest("#homeScreen");
+    if (homeTarget && !hasSession()) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openLogin();
     }
   }, true);
+
+  // Si cualquier código intenta activar homeScreen sin autenticación, se vuelve al login.
+  const observer = new MutationObserver(function () {
+    if (!hasSession()) {
+      const home = document.getElementById("homeScreen");
+      if (home && home.classList.contains("active")) {
+        home.classList.remove("active");
+        openLogin();
+      }
+    }
+  });
+
+  function startObserver() {
+    if (document.body) observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ["class"] });
+  }
+  if (document.body) startObserver();
+  document.addEventListener("DOMContentLoaded", startObserver, { once: true });
 })();
