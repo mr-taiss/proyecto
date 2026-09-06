@@ -1,4 +1,4 @@
-/* Reconocimiento de estudiantes de 6to A */
+/* Reconocimiento de estudiantes de 6to B */
 (function () {
   const STUDENTS = [
     "PEREYRA MARIA RENE","ACUÑA BARRIOS DIANA CAMILA","AGRADA LEZANO JHANA FABIANE","ANIBARRO MONTELLANO MATEO GAEL","APARICIO NAVIA MARIA FERNANDA","ARANCIBIA LLUEN SAMANTA GUADALUPE","AYLLON TELLEZ GABRIELA BELEN","BARRIGA VILLCA LIZETH","BUEZO VALDA MARCELO BENJAMIN","CESPEDES ARANCIBIA FABIO EMMANUEL","CHAMBI ESPINOZA ARIANA AYLIN","CIVERA LOZADA HENRRY MAURICIO","COA LOAYZA NATALIA","COTRINO CHABARRIA ANGELA NATALY","DAZA BARRIENTOS CAMILA DE LOS ANGELES","DAZA MANCILLA ANA EMILIA","DELGADO COPA NATALIA ANDREA","GEMIO FERNANDEZ DIANA BRENDA","GONZALES PANIAGUA DYLAN JEREMY","JESUS SANABRIA IGNACIO ANTONIO","MALDONADO RAMIREZ ANELID ESTHER","MARIN CERVANTES GISSEL PAOLA","MENDEZ CARRASCO IVAN BENIGNO","MONTOYA RAMOS KAMILAH TAIS","OBLITAS CORONADO JUAN SAMUEL","ORTUSTE URQUIZU ANA CECILIA","PARADA GONZALES MARIANA","PEREZ FLORES CARLOS FABIAN","RAMIREZ SIÑANI HUGO JOSE MANUEL","ROCHA LOPEZ ALEJANDRA EDITH","RODRIGUEZ APARICIO SAMANTA","SERRUDO ORTIZ SAMANTA VIOLETA","TEJERINA PACO JUDITH AMAYA","VEDIA DURAN ANTHON SEBASTIAN","VEGA VALDEZ IKER HOLZEN","VILLEGAS ARANCIBIA CAMILA RENATA","ZARCILLO ROJAS ANGELA MARIELA"
@@ -11,13 +11,8 @@
     if (!text) return null;
     const exact = STUDENTS.find(name => normalize(name) === text);
     if (exact) return exact;
-
     const words = text.split(" ").filter(Boolean);
-    const matches = STUDENTS.filter(name => {
-      const candidate = normalize(name);
-      return words.every(word => candidate.includes(word));
-    });
-
+    const matches = STUDENTS.filter(name => words.every(word => normalize(name).includes(word)));
     return matches.length === 1 ? matches[0] : null;
   }
 
@@ -25,23 +20,15 @@
     const input = document.getElementById("studentName");
     const form = document.getElementById("objectForm");
     if (!input || !form) return;
-
     let message = document.getElementById("studentRecognitionMessage");
     if (!message) {
       message = document.createElement("small");
       message.id = "studentRecognitionMessage";
       input.parentElement.appendChild(message);
     }
-
     const check = () => {
       const value = input.value.trim();
-      if (!value) {
-        message.textContent = "";
-        input.style.borderColor = "";
-        input.setCustomValidity("");
-        return null;
-      }
-
+      if (!value) { message.textContent = ""; input.style.borderColor = ""; input.setCustomValidity(""); return null; }
       const student = recognize(value);
       if (student) {
         input.value = student;
@@ -51,33 +38,33 @@
         input.setCustomValidity("");
         return student;
       }
-
-      message.textContent = "✕ Estudiante no registrado en 6to A";
+      message.textContent = "✕ Estudiante no registrado en 6to B";
       message.style.color = "#b44b4b";
       input.style.borderColor = "#c77777";
-      input.setCustomValidity("El estudiante no está registrado en 6to A.");
+      input.setCustomValidity("El estudiante no está registrado en 6to B.");
       return null;
     };
-
     input.addEventListener("input", check);
     input.addEventListener("blur", check);
-
     form.addEventListener("submit", event => {
       const value = input.value.trim();
       if (!value) return;
       const student = recognize(value);
-      if (!student) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        check();
-        input.focus();
-        return;
-      }
-      input.value = student;
-      input.setCustomValidity("");
+      if (!student) { event.preventDefault(); event.stopImmediatePropagation(); check(); input.focus(); return; }
+      input.value = student; input.setCustomValidity("");
     }, true);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup);
   else setup();
+
+  // Carga el control de cuentas después de este archivo.
+  const loadAuth = () => {
+    if (document.querySelector('script[data-sisgop-auth]')) return;
+    const s = document.createElement("script");
+    s.src = "auth.js?v=20260906";
+    s.dataset.sisgopAuth = "1";
+    document.head.appendChild(s);
+  };
+  loadAuth();
 })();
