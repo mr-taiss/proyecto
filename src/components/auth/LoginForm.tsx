@@ -2,75 +2,44 @@ import { useState } from "react";
 import type { FormEventHandler } from "react";
 import type { LoginCredentials } from "../../types/auth";
 
-
 interface LoginFormProps {
   error?: string;
   onSubmit: (credentials: LoginCredentials) => void;
 }
 
-
 function LoginForm({ error, onSubmit }: LoginFormProps) {
-  const [carnet, setCarnet] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [name, setName] = useState("");
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
+    const normalizedName = name.trim();
 
-    const normalizedCarnet = carnet.trim();
-
-
-    if (!normalizedCarnet || !password) {
+    if (!normalizedName) {
       return;
     }
 
-
-    onSubmit({
-      carnet: normalizedCarnet,
-      password,
-    });
+    onSubmit({ name: normalizedName });
   };
-
 
   return (
     <form onSubmit={handleSubmit}>
       <h1>Iniciar sesión</h1>
 
-
       <div>
-        <label htmlFor="carnet">Carnet de identidad</label>
-
+        <label htmlFor="name">Nombre completo</label>
 
         <input
-          id="carnet"
-          name="carnet"
+          id="name"
+          name="name"
           type="text"
-          value={carnet}
-          onChange={(event) => setCarnet(event.target.value)}
-          placeholder="Ingrese su carnet"
-          autoComplete="username"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Ingrese su nombre completo"
+          autoComplete="name"
           required
         />
       </div>
-
-
-      <div>
-        <label htmlFor="password">Contraseña</label>
-
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Ingrese su contraseña"
-          autoComplete="current-password"
-          required
-        />
-      </div>
-
 
       {error && (
         <p role="alert" aria-live="polite">
@@ -78,11 +47,9 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
         </p>
       )}
 
-
       <button type="submit">Ingresar</button>
     </form>
   );
 }
-
 
 export default LoginForm;
