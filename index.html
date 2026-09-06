@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>SISGOP | 6to A</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <section id="welcomeScreen" class="page active">
         <div class="background-shape shape-one"></div>
         <div class="background-shape shape-two"></div>
@@ -21,24 +16,19 @@
         <div class="floating-object object-three">○</div>
         <div class="floating-object object-four">◇</div>
         <div class="floating-object object-five">•</div>
-
         <main class="welcome-content">
             <div class="school-label">6TO A</div>
             <h1>SISGOP</h1>
             <div class="title-line"></div>
             <h2>Sistema de Gestión de Objetos Perdidos</h2>
             <p>Una forma sencilla de registrar, buscar y recuperar objetos dentro del curso.</p>
-
             <button class="backpack-entry" onclick="enterSystem()">
                 <div class="backpack-ring"></div>
                 <div class="backpack">🎒</div>
                 <span>ENTRAR AL SISTEMA</span>
             </button>
-
             <div class="welcome-info">
-                <span>Registro</span>
-                <span>Búsqueda</span>
-                <span>Recuperación</span>
+                <span>Registro</span><span>Búsqueda</span><span>Recuperación</span>
             </div>
         </main>
     </section>
@@ -48,197 +38,74 @@
             <header class="app-header">
                 <div class="brand">
                     <div class="brand-symbol">SG</div>
-                    <div>
-                        <strong>SISGOP</strong>
-                        <small>Sistema de objetos perdidos</small>
-                    </div>
+                    <div><strong>SISGOP</strong><small>Sistema de objetos perdidos</small></div>
                 </div>
                 <div class="course-label">6TO A</div>
             </header>
-
             <main class="dashboard">
                 <div class="dashboard-intro">
-                    <span>PANEL PRINCIPAL</span>
-                    <h1>¿Qué deseas hacer?</h1>
+                    <span>PANEL PRINCIPAL</span><h1>¿Qué deseas hacer?</h1>
                     <p>Selecciona una de las opciones para gestionar los objetos del curso.</p>
                 </div>
-
                 <div class="statistics">
-                    <div class="stat-card">
-                        <div class="stat-icon lost">!</div>
-                        <div><strong id="lostCount">0</strong><span>Perdidos</span></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon found">✓</div>
-                        <div><strong id="foundCount">0</strong><span>Encontrados</span></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon recovered">↗</div>
-                        <div><strong id="recoveredCount">0</strong><span>Recuperados</span></div>
-                    </div>
+                    <div class="stat-card"><div class="stat-icon lost">!</div><div><strong id="lostCount">0</strong><span>Perdidos</span></div></div>
+                    <div class="stat-card"><div class="stat-icon found">✓</div><div><strong id="foundCount">0</strong><span>Encontrados</span></div></div>
+                    <div class="stat-card"><div class="stat-icon recovered">↗</div><div><strong id="recoveredCount">0</strong><span>Recuperados</span></div></div>
                 </div>
-
                 <div class="menu-grid">
-                    <button class="menu-card register" onclick="openRegister()">
-                        <div class="menu-card-icon">+</div>
-                        <div class="menu-card-content"><span>REGISTRO</span><h2>Registrar objeto</h2><p>Añade un objeto perdido o encontrado.</p></div>
-                        <div class="menu-arrow">→</div>
-                    </button>
-                    <button class="menu-card search" onclick="openSearch()">
-                        <div class="menu-card-icon">⌕</div>
-                        <div class="menu-card-content"><span>BÚSQUEDA</span><h2>Buscar objeto</h2><p>Encuentra un objeto registrado.</p></div>
-                        <div class="menu-arrow">→</div>
-                    </button>
-                    <button class="menu-card objects" onclick="openObjects()">
-                        <div class="menu-card-icon">≡</div>
-                        <div class="menu-card-content"><span>REGISTROS</span><h2>Ver objetos</h2><p>Consulta todos los objetos registrados.</p></div>
-                        <div class="menu-arrow">→</div>
-                    </button>
-                    <button class="menu-card notifications" onclick="openNotifications()">
-                        <div class="menu-card-icon">!</div>
-                        <div class="menu-card-content"><span>ALERTAS</span><h2>Avisos</h2><p>Revisa objetos encontrados pendientes de reclamar.</p></div>
-                        <div id="notificationBadge" class="notification-badge">0</div>
-                    </button>
+                    <button class="menu-card register" onclick="openRegister()"><div class="menu-card-icon">+</div><div class="menu-card-content"><span>REGISTRO</span><h2>Registrar objeto</h2><p>Añade un objeto perdido o encontrado.</p></div><div class="menu-arrow">→</div></button>
+                    <button class="menu-card search" onclick="openSearch()"><div class="menu-card-icon">⌕</div><div class="menu-card-content"><span>BÚSQUEDA</span><h2>Buscar objeto</h2><p>Encuentra un objeto registrado.</p></div><div class="menu-arrow">→</div></button>
+                    <button class="menu-card objects" onclick="openObjects()"><div class="menu-card-icon">≡</div><div class="menu-card-content"><span>REGISTROS</span><h2>Ver objetos</h2><p>Consulta todos los objetos registrados.</p></div><div class="menu-arrow">→</div></button>
+                    <button class="menu-card notifications" onclick="openNotifications()"><div class="menu-card-icon">!</div><div class="menu-card-content"><span>ALERTAS</span><h2>Avisos</h2><p>Revisa objetos encontrados pendientes de reclamar.</p></div><div id="notificationBadge" class="notification-badge">0</div></button>
                 </div>
-
                 <button class="return-welcome" onclick="returnToWelcome()">← Volver a portada</button>
             </main>
-
-            <footer class="app-footer">
-                <span>SISGOP</span>
-                <span>Sistema exclusivo para 6to A</span>
-                <span>2026</span>
-            </footer>
+            <footer class="app-footer"><span>SISGOP</span><span>Sistema exclusivo para 6to A</span><span>2026</span></footer>
         </div>
     </section>
 
     <section id="registerScreen" class="page internal-page">
         <div class="internal-container">
-            <header class="internal-header">
-                <button class="back-link" onclick="openHome()">← Volver al menú</button>
-                <div><span>REGISTRO</span><h1 id="formTitle">Registrar objeto</h1></div>
-            </header>
+            <header class="internal-header"><button class="back-link" onclick="openHome()">← Volver al menú</button><div><span>REGISTRO</span><h1 id="formTitle">Registrar objeto</h1></div></header>
             <form id="objectForm" class="form-card">
-                <div class="form-section-title">
-                    <span class="section-number">01</span>
-                    <div><strong>Información del objeto</strong><p>Completa los datos principales.</p></div>
-                </div>
+                <div class="form-section-title"><span class="section-number">01</span><div><strong>Información del objeto</strong><p>Completa los datos principales.</p></div></div>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>Estado inicial</label>
-                        <select id="objectStatus">
-                            <option value="Perdido">Perdido</option>
-                            <option value="Encontrado">Encontrado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de objeto</label>
-                        <select id="objectCategory" required>
-                            <option value="">Selecciona un tipo</option>
-                            <option value="Prendas">Prendas</option>
-                            <option value="Dispositivos electrónicos">Dispositivos electrónicos</option>
-                            <option value="Útiles escolares">Útiles escolares</option>
-                            <option value="Objetos personales">Objetos personales</option>
-                        </select>
-                    </div>
-                    <div class="form-group full">
-                        <label>Nombre del objeto</label>
-                        <select id="objectName" required disabled>
-                            <option value="">Primero selecciona un tipo de objeto</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>Estado inicial</label><select id="objectStatus"><option value="Perdido">Perdido</option><option value="Encontrado">Encontrado</option></select></div>
+                    <div class="form-group"><label>Tipo de objeto</label><select id="objectCategory" required><option value="">Selecciona un tipo</option><option value="Prendas">Prendas</option><option value="Dispositivos electrónicos">Dispositivos electrónicos</option><option value="Útiles escolares">Útiles escolares</option><option value="Objetos personales">Objetos personales</option></select></div>
+                    <div class="form-group full"><label>Nombre del objeto</label><select id="objectName" required disabled><option value="">Primero selecciona un tipo de objeto</option></select></div>
                     <div class="form-group full"><label>Descripción</label><textarea id="objectDescription" placeholder="Describe características que permitan identificarlo..." required></textarea></div>
                 </div>
-                <div class="form-section-title second">
-                    <span class="section-number">02</span>
-                    <div><strong>Información del lugar</strong><p>Indica dónde fue perdido o encontrado.</p></div>
-                </div>
+                <div class="form-section-title second"><span class="section-number">02</span><div><strong>Información del lugar</strong><p>Indica dónde fue perdido o encontrado.</p></div></div>
                 <div class="form-grid">
                     <div class="form-group"><label>Fecha</label><input id="objectDate" type="date" required></div>
-                    <div class="form-group">
-                        <label>Lugar</label>
-                        <select id="objectPlace" required>
-                            <option value="">Selecciona un lugar</option>
-                            <option value="Curso">Curso</option>
-                            <option value="Patio">Patio</option>
-                            <option value="Pasillos">Pasillos</option>
-                            <option value="Baños">Baños</option>
-                            <option value="Cancha de secundaria">Cancha de secundaria</option>
-                            <option value="Kioscos">Kioscos</option>
-                            <option value="Teatro">Teatro</option>
-                            <option value="Coliseo">Coliseo</option>
-                            <option value="Templo">Templo</option>
-                            <option value="Canchas de primaria">Canchas de primaria</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Estudiante <small>(opcional)</small></label><input id="studentName" type="text" placeholder="Nombre del estudiante"></div>
+                    <div class="form-group"><label>Lugar</label><select id="objectPlace" required><option value="">Selecciona un lugar</option><option value="Curso">Curso</option><option value="Patio">Patio</option><option value="Pasillos">Pasillos</option><option value="Baños">Baños</option><option value="Cancha de secundaria">Cancha de secundaria</option><option value="Kioscos">Kioscos</option><option value="Teatro">Teatro</option><option value="Coliseo">Coliseo</option><option value="Templo">Templo</option><option value="Canchas de primaria">Canchas de primaria</option></select></div>
+                    <div class="form-group"><label>Estudiante <small>(opcional)</small></label><input id="studentName" type="text" placeholder="Nombre del estudiante" autocomplete="off"></div>
                     <div class="form-group"><label>Fotografía <small>(opcional)</small></label><input id="objectImage" type="file" accept="image/*"></div>
                 </div>
                 <div id="imagePreview" class="image-preview"></div>
-                <div class="form-actions">
-                    <button type="button" class="secondary-button" onclick="openHome()">Cancelar</button>
-                    <button type="submit" class="primary-button">Guardar objeto</button>
-                </div>
+                <div class="form-actions"><button type="button" class="secondary-button" onclick="openHome()">Cancelar</button><button type="submit" class="primary-button">Guardar objeto</button></div>
             </form>
         </div>
     </section>
 
     <section id="searchScreen" class="page internal-page">
         <div class="internal-container">
-            <header class="internal-header">
-                <button class="back-link" onclick="openHome()">← Volver al menú</button>
-                <div><span>BÚSQUEDA</span><h1>Buscar objeto</h1></div>
-            </header>
-            <div class="content-card">
-                <div class="search-panel">
-                    <input id="searchInput" type="text" placeholder="Buscar por nombre, lugar o estudiante...">
-                    <select id="searchStatus"><option value="Todos">Todos los estados</option><option value="Perdido">Perdidos</option><option value="Encontrado">Encontrados</option><option value="Recuperado">Recuperados</option></select>
-                    <button class="primary-button" onclick="searchObjects()">Buscar</button>
-                </div>
-                <div class="table-container"><table><thead><tr><th>ID</th><th>OBJETO</th><th>FECHA</th><th>LUGAR</th><th>ESTADO</th><th>ACCIONES</th></tr></thead><tbody id="searchTableBody"></tbody></table></div>
-            </div>
+            <header class="internal-header"><button class="back-link" onclick="openHome()">← Volver al menú</button><div><span>BÚSQUEDA</span><h1>Buscar objeto</h1></div></header>
+            <div class="content-card"><div class="search-panel"><input id="searchInput" type="text" placeholder="Buscar por nombre, lugar o estudiante..."><select id="searchStatus"><option value="Todos">Todos los estados</option><option value="Perdido">Perdidos</option><option value="Encontrado">Encontrados</option><option value="Recuperado">Recuperados</option></select><button class="primary-button" onclick="searchObjects()">Buscar</button></div><div class="table-container"><table><thead><tr><th>ID</th><th>OBJETO</th><th>FECHA</th><th>LUGAR</th><th>ESTADO</th><th>ACCIONES</th></tr></thead><tbody id="searchTableBody"></tbody></table></div></div>
         </div>
     </section>
 
     <section id="objectsScreen" class="page internal-page">
         <div class="internal-container">
-            <header class="internal-header">
-                <button class="back-link" onclick="openHome()">← Volver al menú</button>
-                <div><span>REGISTROS</span><h1>Objetos registrados</h1></div>
-            </header>
-            <div class="content-card">
-                <div class="filter-bar">
-                    <button class="filter-button active" onclick="filterObjects('Todos', this)">Todos</button>
-                    <button class="filter-button" onclick="filterObjects('Perdido', this)">Perdidos</button>
-                    <button class="filter-button" onclick="filterObjects('Encontrado', this)">Encontrados</button>
-                    <button class="filter-button" onclick="filterObjects('Recuperado', this)">Recuperados</button>
-                </div>
-                <div class="table-container"><table><thead><tr><th>ID</th><th>OBJETO</th><th>FECHA</th><th>LUGAR</th><th>ESTADO</th><th>ACCIONES</th></tr></thead><tbody id="objectsTableBody"></tbody></table></div>
-            </div>
+            <header class="internal-header"><button class="back-link" onclick="openHome()">← Volver al menú</button><div><span>REGISTROS</span><h1>Objetos registrados</h1></div></header>
+            <div class="content-card"><div class="filter-bar"><button class="filter-button active" onclick="filterObjects('Todos', this)">Todos</button><button class="filter-button" onclick="filterObjects('Perdido', this)">Perdidos</button><button class="filter-button" onclick="filterObjects('Encontrado', this)">Encontrados</button><button class="filter-button" onclick="filterObjects('Recuperado', this)">Recuperados</button></div><div class="table-container"><table><thead><tr><th>ID</th><th>OBJETO</th><th>FECHA</th><th>LUGAR</th><th>ESTADO</th><th>ACCIONES</th></tr></thead><tbody id="objectsTableBody"></tbody></table></div></div>
         </div>
     </section>
 
-    <section id="notificationsScreen" class="page internal-page">
-        <div class="internal-container">
-            <header class="internal-header">
-                <button class="back-link" onclick="openHome()">← Volver al menú</button>
-                <div><span>ALERTAS</span><h1>Avisos</h1></div>
-            </header>
-            <div id="notificationsContent" class="notifications-list"></div>
-        </div>
-    </section>
-
-    <section id="detailScreen" class="page internal-page">
-        <div class="internal-container">
-            <header class="internal-header">
-                <button class="back-link" onclick="openObjects()">← Volver a objetos</button>
-                <div><span>INFORMACIÓN</span><h1>Detalle del objeto</h1></div>
-            </header>
-            <div id="detailContent" class="detail-card"></div>
-        </div>
-    </section>
-
+    <section id="notificationsScreen" class="page internal-page"><div class="internal-container"><header class="internal-header"><button class="back-link" onclick="openHome()">← Volver al menú</button><div><span>ALERTAS</span><h1>Avisos</h1></div></header><div id="notificationsContent" class="notifications-list"></div></div></section>
+    <section id="detailScreen" class="page internal-page"><div class="internal-container"><header class="internal-header"><button class="back-link" onclick="openObjects()">← Volver a objetos</button><div><span>INFORMACIÓN</span><h1>Detalle del objeto</h1></div></header><div id="detailContent" class="detail-card"></div></div></section>
     <div id="toast" class="toast"></div>
-    <script src="script.js"></script>
+    <script src="script.js?v=20260906"></script>
+    <script src="student-recognition.js?v=20260906"></script>
 </body>
 </html>
