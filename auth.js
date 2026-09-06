@@ -79,6 +79,7 @@
 
   window.enterSystem = function () { if (currentUser()) { if (!hasChangedPassword(currentUser())) showChangePassword(true); else { window.openHome(); updateUserBadge(); } } else showLogin(); };
   window.loginSISGOP = login; window.logoutSISGOP = logout; window.currentSISGOPUser = currentUser; window.changePasswordSISGOP = () => showChangePassword(false);
+  window.__SISGOP_AUTH_READY = true;
 
   function installGuards() {
     const registerForm = document.getElementById("objectForm");
