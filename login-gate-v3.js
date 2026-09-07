@@ -4,17 +4,22 @@
   const authLogin = window.enterSystem;
 
   function fixNamePlaceholder() {
-    const input = document.getElementById("sisgopLoginUser");
-    if (input) input.placeholder = "Escribe tu nombre completo";
-    document.querySelectorAll('input[placeholder*="ej. tais"], input[placeholder*="ej tais"], input[placeholder*="Ej. tais"], input[placeholder*="Tais"]').forEach(function (el) {
-      el.placeholder = "Escribe tu nombre completo";
+    document.querySelectorAll("input").forEach(function (el) {
+      const p = String(el.getAttribute("placeholder") || "").toLowerCase();
+      if (p.includes("tais") || p.includes("ej.") || p.includes("ej ")) {
+        el.setAttribute("placeholder", "Escribe tu nombre completo");
+      }
     });
+    const input = document.getElementById("sisgopLoginUser");
+    if (input) input.setAttribute("placeholder", "Escribe tu nombre completo");
   }
+
+  const observer = new MutationObserver(function () { fixNamePlaceholder(); });
+  observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["placeholder"] });
 
   function showLogin() {
     localStorage.removeItem(SESSION_KEY);
     document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
-
     if (typeof authLogin === "function") {
       authLogin();
       fixNamePlaceholder();
@@ -23,7 +28,6 @@
       setTimeout(fixNamePlaceholder, 300);
       return;
     }
-
     let overlay = document.getElementById("sisgopLoginLoading");
     if (!overlay) {
       overlay = document.createElement("div");
@@ -34,9 +38,7 @@
     }
   }
 
-  function authenticated() {
-    return !!localStorage.getItem(SESSION_KEY);
-  }
+  function authenticated() { return !!localStorage.getItem(SESSION_KEY); }
 
   function protectHome() {
     if (!authenticated()) {
