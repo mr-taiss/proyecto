@@ -2,6 +2,7 @@
 (function () {
   const OBJECTS_KEY = "sisgop_objects";
   const SESSION_KEY = "sisgop_current_user";
+  const LEGACY_OWNER = "__legacy_owner_unknown__";
 
   function readObjects() {
     try {
@@ -14,6 +15,18 @@
 
   function currentUserName() {
     return String(localStorage.getItem(SESSION_KEY) || "").trim();
+  }
+
+  function protectLegacyObjects() {
+    const data = readObjects();
+    let changed = false;
+    data.forEach(item => {
+      if (!item.owner) {
+        item.owner = LEGACY_OWNER;
+        changed = true;
+      }
+    });
+    if (changed) localStorage.setItem(OBJECTS_KEY, JSON.stringify(data));
   }
 
   function ownerCanModify(id) {
@@ -48,13 +61,14 @@
     const created = data.filter(item => !beforeIds.has(String(item.id)));
     if (!created.length) return;
     const newest = created[created.length - 1];
-    if (!newest.owner) {
+    if (!newest.owner || newest.owner === LEGACY_OWNER) {
       newest.owner = user;
       localStorage.setItem(OBJECTS_KEY, JSON.stringify(data));
     }
   }
 
   function install() {
+    protectLegacyObjects();
     ["editObject", "deleteObject", "markFound", "markRecovered"].forEach(protectAction);
 
     const form = document.getElementById("objectForm");
