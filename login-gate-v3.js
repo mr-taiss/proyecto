@@ -11,6 +11,10 @@
     // Usamos su función original para evitar dos formularios distintos.
     if (typeof authLogin === "function") {
       authLogin();
+      setTimeout(function () {
+        const input = document.getElementById("sisgopLoginUser");
+        if (input) input.placeholder = "Escribe tu nombre completo";
+      }, 0);
       return;
     }
 
