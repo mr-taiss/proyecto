@@ -14,9 +14,7 @@
     const text = normalize(value);
     if (!text) return null;
     const exact = USERS.find(user => normalize(user.name) === text);
-    if (exact) return exact;
-    const matches = USERS.filter(user => text.split(" ").filter(Boolean).every(word => normalize(user.name).includes(word)));
-    return matches.length === 1 ? matches[0] : null;
+    return exact || null;
   };
   const currentUser = () => {
     const saved = localStorage.getItem(SESSION_KEY);
@@ -59,7 +57,7 @@
     const user = findUser(document.getElementById("sisgopLoginUser")?.value);
     const password = document.getElementById("sisgopLoginPassword")?.value || "";
     const message = document.getElementById("sisgopLoginMessage");
-    if (!user) { message.textContent = "Primero escribe tu nombre completo."; message.style.color = "#b44b4b"; return; }
+    if (!user) { message.textContent = "Nombre no autorizado. Escribe tu nombre completo exactamente como está registrado."; message.style.color = "#b44b4b"; return; }
     if (password !== getPassword(user)) { message.textContent = "Escribe primero tu contraseña actual."; message.style.color = "#b44b4b"; return; }
     localStorage.setItem(SESSION_KEY, user.name);
     document.getElementById("sisgopLoginOverlay")?.remove();
@@ -97,7 +95,8 @@
     const user = findUser(document.getElementById("sisgopLoginUser")?.value);
     const password = document.getElementById("sisgopLoginPassword")?.value || "";
     const message = document.getElementById("sisgopLoginMessage");
-    if (!user || password !== getPassword(user)) { message.textContent = "Usuario o contraseña incorrectos."; message.style.color = "#b44b4b"; return; }
+    if (!user) { message.textContent = "Nombre no autorizado."; message.style.color = "#b44b4b"; return; }
+    if (password !== getPassword(user)) { message.textContent = "Usuario o contraseña incorrectos."; message.style.color = "#b44b4b"; return; }
     localStorage.setItem(SESSION_KEY, user.name);
     document.getElementById("sisgopLoginOverlay")?.remove();
     if (!hasChangedPassword(user)) { showChangePassword(true); return; }
@@ -140,10 +139,15 @@
         let data = [];
         try { data = JSON.parse(localStorage.getItem(OBJECTS_KEY) || "[]"); } catch { return; }
         for (let i = data.length - 1; i >= 0; i--) {
-          if (!data[i].owner) { data[i].owner = user.name; localStorage.setItem(OBJECTS_KEY, JSON.stringify(data)); break; }
+          if (!data[i].owner) {
+            data[i].owner = user.name;
+            localStorage.setItem(OBJECTS_KEY, JSON.stringify(data));
+            break;
+          }
         }
       }, 0));
     }
+
     ["editObject","deleteObject","markFound","markRecovered"].forEach(name => {
       const original = window[name];
       if (typeof original !== "function" || original.__sisgopWrapped) return;
@@ -172,7 +176,7 @@
   }, true);
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", installGuards, {once:true});
+    document.addEventListener("DOMContentLoaded", installGuards, { once: true });
   } else {
     installGuards();
   }
