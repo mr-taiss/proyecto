@@ -3,23 +3,27 @@
   const SESSION_KEY = "sisgop_current_user";
   const authLogin = window.enterSystem;
 
+  function fixNamePlaceholder() {
+    const input = document.getElementById("sisgopLoginUser");
+    if (input) input.placeholder = "Escribe tu nombre completo";
+    document.querySelectorAll('input[placeholder*="ej. tais"], input[placeholder*="ej tais"], input[placeholder*="Ej. tais"], input[placeholder*="Tais"]').forEach(function (el) {
+      el.placeholder = "Escribe tu nombre completo";
+    });
+  }
+
   function showLogin() {
     localStorage.removeItem(SESSION_KEY);
     document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
 
-    // auth.js ya tiene el formulario y la lógica real de acceso.
-    // Usamos su función original para evitar dos formularios distintos.
     if (typeof authLogin === "function") {
       authLogin();
-      setTimeout(function () {
-        const input = document.getElementById("sisgopLoginUser");
-        if (input) input.placeholder = "Escribe tu nombre completo";
-      }, 0);
+      fixNamePlaceholder();
+      setTimeout(fixNamePlaceholder, 0);
+      setTimeout(fixNamePlaceholder, 50);
+      setTimeout(fixNamePlaceholder, 300);
       return;
     }
 
-    // Si auth.js todavía está cargando, mostramos un aviso en lugar de dejar
-    // el botón sin respuesta.
     let overlay = document.getElementById("sisgopLoginLoading");
     if (!overlay) {
       overlay = document.createElement("div");
@@ -72,6 +76,7 @@
         return false;
       };
     }
+    fixNamePlaceholder();
     if (!authenticated()) showLogin();
   }
 
