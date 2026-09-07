@@ -1,32 +1,38 @@
-# React + TypeScript + Vite
+# SISGOP — Sistema de Gestión de Objetos Perdidos
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicación web para el registro, búsqueda y recuperación de objetos perdidos del 6to B del Colegio Don Bosco.
 
-Currently, two official plugins are available:
+## Funciones principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Inicio de sesión mediante nombre autorizado y contraseña.
+- 37 estudiantes autorizados.
+- Cambio de contraseña después del primer acceso.
+- Cierre de sesión independiente del cambio de contraseña.
+- Registro de objetos perdidos o encontrados.
+- Clasificación por tipo de objeto.
+- Selección del lugar donde se perdió o encontró.
+- Búsqueda y filtrado por estado.
+- Avisos de objetos encontrados.
+- Historial de cambios.
+- Fotografía opcional del objeto.
+- Permisos: cada estudiante puede modificar únicamente los objetos que registró.
+- Los demás estudiantes pueden consultar los objetos registrados.
 
-## React Compiler
+## Ejecución
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Para una compilación de producción:
+
+```bash
+npm run build
+```
+
+## Estructura funcional
+
+La interfaz que se ejecuta desde Vite utiliza `index.html`, `style.css`, `script.js`, `auth.js` y `permissions.js`. Los archivos antiguos de autenticación fueron retirados para evitar conflictos y duplicaciones.
+
+> Nota: las credenciales y los cambios de contraseña del prototipo se gestionan localmente en el navegador mediante `localStorage`. Para una versión real multiusuario se recomienda implementar autenticación y almacenamiento en un backend con base de datos.
