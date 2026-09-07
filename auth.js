@@ -18,13 +18,22 @@
     let box = document.getElementById("sisgopLoginOverlay");
     if (!box) {
       box = document.createElement("div"); box.id = "sisgopLoginOverlay";
-      box.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#eef4ff,#f8fbff);font-family:Arial,sans-serif;box-sizing:border-box"><div style="width:min(440px,100%);background:white;border-radius:22px;padding:32px;box-shadow:0 18px 50px rgba(20,40,80,.16);box-sizing:border-box"><div style="text-align:center;margin-bottom:24px"><div style="font-size:42px">🔐</div><h1 style="margin:8px 0 4px;color:#183b68">SISGOP</h1><p style="margin:0;color:#667085">Acceso personal · 6to B</p></div><form id="sisgopLoginForm"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre (ej. tais)" style="width:100%;padding:13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Contraseña</label><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" style="width:100%;padding:13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:14px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:10px;background:#245ea8;color:white;font-weight:700;font-size:15px;cursor:pointer">ENTRAR</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:12px;border:0;background:transparent;color:#526173;cursor:pointer">← Volver</button></form></div></div>`;
+      box.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#eef4ff,#f8fbff);font-family:Arial,sans-serif;box-sizing:border-box"><div style="width:min(440px,100%);background:white;border-radius:22px;padding:32px;box-shadow:0 18px 50px rgba(20,40,80,.16);box-sizing:border-box"><div style="text-align:center;margin-bottom:24px"><div style="font-size:42px">🔐</div><h1 style="margin:8px 0 4px;color:#183b68">SISGOP</h1><p style="margin:0;color:#667085">Acceso personal · 6to B</p></div><form id="sisgopLoginForm"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre (ej. tais)" style="width:100%;padding:13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" style="width:100%;padding:13px 46px 13px 13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><button type="button" id="togglePassword" aria-label="Mostrar contraseña" title="Mostrar contraseña" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:14px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:10px;background:#245ea8;color:white;font-weight:700;font-size:15px;cursor:pointer">ENTRAR</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:12px;border:0;background:transparent;color:#526173;cursor:pointer">← Volver</button></form></div></div>`;
       document.body.appendChild(box);
+      document.getElementById("togglePassword").addEventListener("click", () => {
+        const password = document.getElementById("sisgopLoginPassword");
+        const toggle = document.getElementById("togglePassword");
+        const visible = password.type === "text";
+        password.type = visible ? "password" : "text";
+        toggle.textContent = "👁️";
+        toggle.setAttribute("aria-label", visible ? "Mostrar contraseña" : "Ocultar contraseña");
+        toggle.setAttribute("title", visible ? "Mostrar contraseña" : "Ocultar contraseña");
+      });
       document.getElementById("sisgopLoginForm").addEventListener("submit", e => { e.preventDefault(); login(); });
       document.getElementById("sisgopLoginBack").addEventListener("click", () => { box.remove(); document.querySelectorAll(".page").forEach(p => p.classList.remove("active")); document.getElementById("welcomeScreen")?.classList.add("active"); });
     }
     box.style.display = "block";
-    document.getElementById("sisgopLoginUser").value = ""; document.getElementById("sisgopLoginPassword").value = ""; document.getElementById("sisgopLoginMessage").textContent = "";
+    document.getElementById("sisgopLoginUser").value = ""; document.getElementById("sisgopLoginPassword").value = ""; document.getElementById("sisgopLoginPassword").type = "password"; document.getElementById("togglePassword").textContent = "👁️"; document.getElementById("sisgopLoginMessage").textContent = "";
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active")); document.getElementById("sisgopLoginUser").focus();
   }
 
@@ -55,9 +64,12 @@
   }
 
   function login() {
-    const user = findUser(document.getElementById("sisgopLoginUser")?.value); const password = document.getElementById("sisgopLoginPassword")?.value || ""; const message = document.getElementById("sisgopLoginMessage");
+    const userInput = document.getElementById("sisgopLoginUser") || document.getElementById("sisgopLoginUserV3");
+    const passwordInput = document.getElementById("sisgopLoginPassword") || document.getElementById("sisgopLoginPasswordV3");
+    const message = document.getElementById("sisgopLoginMessage") || document.getElementById("sisgopLoginMessageV3");
+    const user = findUser(userInput?.value); const password = passwordInput?.value || "";
     if (!user || password !== getPassword(user)) { if (message) { message.textContent = "Usuario o contraseña incorrectos."; message.style.color = "#b44b4b"; } return; }
-    localStorage.setItem(SESSION_KEY, user.name); document.getElementById("sisgopLoginOverlay")?.remove(); updateUserBadge();
+    localStorage.setItem(SESSION_KEY, user.name); document.getElementById("sisgopLoginOverlay")?.remove(); document.getElementById("sisgopLoginOverlayV3")?.remove(); updateUserBadge();
     if (!hasChangedPassword(user)) { showChangePassword(true); return; }
     if (typeof window.openHome === "function") window.openHome();
   }
@@ -77,7 +89,6 @@
     badge.innerHTML = `<strong>${user.name}</strong> <button onclick="changePasswordSISGOP()" style="margin-left:8px;border:0;background:transparent;color:#245ea8;cursor:pointer">Cambiar contraseña</button><button onclick="logoutSISGOP()" style="margin-left:8px;border:0;background:transparent;color:#b44b4b;cursor:pointer">Salir</button>`;
   }
 
-  // Al entrar desde la portada siempre se solicita el login. La sesión guardada no salta esta pantalla.
   window.enterSystem = function () { localStorage.removeItem(SESSION_KEY); showLogin(); };
   window.loginSISGOP = login; window.logoutSISGOP = logout; window.currentSISGOPUser = currentUser; window.changePasswordSISGOP = () => showChangePassword(false);
   window.__SISGOP_AUTH_READY = true;
