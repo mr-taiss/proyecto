@@ -1,74 +1,49 @@
 /* SISGOP - acceso obligatorio */
 (function () {
   const SESSION_KEY = "sisgop_current_user";
-  const authLogin = window.enterSystem;
-
-  function fixNamePlaceholder() {
-    document.querySelectorAll("input").forEach(function (el) {
-      const p = String(el.getAttribute("placeholder") || "").toLowerCase();
-      if (p.includes("tais") || p.includes("ej.") || p.includes("ej ")) {
-        el.setAttribute("placeholder", "Escribe tu nombre completo");
-      }
-    });
-    const input = document.getElementById("sisgopLoginUser");
-    if (input) input.setAttribute("placeholder", "Escribe tu nombre completo");
-  }
-
-  const observer = new MutationObserver(function () { fixNamePlaceholder(); });
-  observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["placeholder"] });
 
   function showLogin() {
     localStorage.removeItem(SESSION_KEY);
-    document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
-    if (typeof authLogin === "function") {
-      authLogin();
-      fixNamePlaceholder();
-      setTimeout(fixNamePlaceholder, 0);
-      setTimeout(fixNamePlaceholder, 50);
-      setTimeout(fixNamePlaceholder, 300);
-      return;
-    }
-    let overlay = document.getElementById("sisgopLoginLoading");
-    if (!overlay) {
-      overlay = document.createElement("div");
-      overlay.id = "sisgopLoginLoading";
-      overlay.style.cssText = "position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#eef4ff;font-family:Arial,sans-serif";
-      overlay.innerHTML = '<div style="background:#fff;padding:30px;border-radius:20px;box-shadow:0 15px 45px rgba(0,0,0,.15);text-align:center"><h2 style="color:#183b68">SISGOP</h2><p>El acceso está cargando...</p></div>';
-      document.body.appendChild(overlay);
-    }
-  }
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const old = document.getElementById("sisgopLoginOverlay");
+    if (old) old.remove();
 
-  function authenticated() { return !!localStorage.getItem(SESSION_KEY); }
+    const box = document.createElement("div");
+    box.id = "sisgopLoginOverlay");
+    box.style.cssText = "position:fixed;inset:0;z-index:999999;background:#eef4ff;overflow:auto;font-family:Arial,sans-serif";
+    box.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box"><div style="width:min(440px,100%);background:white;border-radius:22px;padding:32px;box-shadow:0 18px 50px rgba(20,40,80,.16);box-sizing:border-box"><div style="text-align:center;margin-bottom:24px"><div style="font-size:42px">🔐</div><h1 style="margin:8px 0 4px;color:#183b68">SISGOP</h1><p style="margin:0;color:#667085">Acceso personal · 6to B</p></div><form id="sisgopLoginForm"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre completo" style="width:100%;padding:13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><label style="display:block;margin:14px 0 7px;font-weight:700;color:#334155">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" style="width:100%;padding:13px 46px 13px 13px;border:1px solid #ccd5e1;border-radius:10px;box-sizing:border-box;font-size:15px"><button type="button" id="togglePassword" aria-label="Mostrar contraseña" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:14px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:10px;background:#245ea8;color:white;font-weight:700;font-size:15px;cursor:pointer">ENTRAR</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:12px;border:0;background:transparent;color:#526173;cursor:pointer">← Volver</button></form></div></div>';
+    document.body.appendChild(box);
 
-  function protectHome() {
-    if (!authenticated()) {
-      const home = document.getElementById("homeScreen");
-      if (home) home.classList.remove("active");
-    }
+    document.getElementById("togglePassword").onclick = function () {
+      const p = document.getElementById("sisgopLoginPassword");
+      p.type = p.type === "password" ? "text" : "password";
+    };
+    document.getElementById("sisgopLoginForm").onsubmit = function (e) {
+      e.preventDefault();
+      if (typeof window.loginSISGOP === "function") {
+        window.loginSISGOP();
+      } else {
+        document.getElementById("sisgopLoginMessage").textContent = "El sistema de acceso todavía está cargando. Recarga la página.";
+      }
+    };
+    document.getElementById("sisgopLoginBack").onclick = function () {
+      box.remove();
+      document.getElementById("welcomeScreen")?.classList.add("active");
+    };
+    document.getElementById("sisgopLoginUser").focus();
   }
 
   window.showSISGOPLogin = showLogin;
-  window.enterSystem = showLogin;
 
   document.addEventListener("click", function (e) {
     const button = e.target.closest && e.target.closest(".backpack-entry");
-    if (button) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      showLogin();
-      return false;
-    }
-    const home = e.target.closest && e.target.closest("#homeScreen");
-    if (home && !authenticated()) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      showLogin();
-      return false;
-    }
+    if (!button) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    showLogin();
   }, true);
 
   function init() {
-    protectHome();
     const button = document.querySelector(".backpack-entry");
     if (button) {
       button.onclick = function (e) {
@@ -78,12 +53,11 @@
         return false;
       };
     }
-    fixNamePlaceholder();
-    if (!authenticated()) showLogin();
+    if (!localStorage.getItem(SESSION_KEY)) {
+      document.getElementById("homeScreen")?.classList.remove("active");
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  setTimeout(init, 50);
-  setTimeout(init, 500);
 })();
