@@ -105,6 +105,61 @@
   window.showSISGOPLogin = window.showSISGOPLogin || showFallbackLogin;
   document.addEventListener("click",e=>{const b=e.target.closest?.(".backpack-entry");if(!b)return;e.preventDefault();e.stopImmediatePropagation();showFallbackLogin();},true);
 
+  /* ESTILO DEL BLOQUE DE USUARIO: integrado al encabezado, no flotando en la esquina */
+  const styleUserBadge = () => {
+    if (document.getElementById("sisgopUserBadgeStyle")) return;
+    const style = document.createElement("style");
+    style.id = "sisgopUserBadgeStyle";
+    style.textContent = `
+      #sisgopUserBadge {
+        position: fixed !important;
+        top: 18px !important;
+        right: 24px !important;
+        z-index: 9998 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px 14px !important;
+        border: 1px solid #dce2eb !important;
+        border-radius: 14px !important;
+        background: rgba(255,255,255,.96) !important;
+        box-shadow: 0 8px 25px rgba(35,53,76,.10) !important;
+        color: #24405f !important;
+        font: 12px "Segoe UI",Arial,sans-serif !important;
+        max-width: calc(100vw - 48px) !important;
+      }
+      #sisgopUserBadge strong {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        color: #14233f !important;
+        font-size: 11px !important;
+        letter-spacing: .3px !important;
+        white-space: nowrap !important;
+      }
+      #sisgopUserBadge strong::before { content: "👤"; font-size: 15px; }
+      #sisgopUserBadge button {
+        margin-left: 2px !important;
+        padding: 5px 7px !important;
+        border: 0 !important;
+        border-radius: 7px !important;
+        background: transparent !important;
+        font: 600 10px "Segoe UI",Arial,sans-serif !important;
+        cursor: pointer !important;
+        transition: background .2s, transform .2s !important;
+      }
+      #sisgopUserBadge button:first-of-type { color: #245ea8 !important; }
+      #sisgopUserBadge button:last-of-type { color: #a65353 !important; }
+      #sisgopUserBadge button:hover { background: #edf3f9 !important; transform: translateY(-1px); }
+      @media(max-width:700px){
+        #sisgopUserBadge { top: 10px !important; right: 10px !important; padding: 8px 10px !important; gap: 4px !important; }
+        #sisgopUserBadge strong { max-width: 180px !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  };
+  styleUserBadge();
+
   const loadAuth = () => {
     if (document.querySelector('script[data-sisgop-auth]')) return;
     const s = document.createElement("script");
