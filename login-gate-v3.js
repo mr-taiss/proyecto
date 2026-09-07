@@ -18,17 +18,27 @@
         const password = document.getElementById("sisgopLoginPasswordV3");
         const visible = password.type === "text";
         password.type = visible ? "password" : "text";
-        this.textContent = visible ? "👁️" : "🙈";
+        this.textContent = "👁️";
         this.setAttribute("aria-label", visible ? "Mostrar contraseña" : "Ocultar contraseña");
         this.setAttribute("title", visible ? "Mostrar contraseña" : "Ocultar contraseña");
       });
 
       overlay.querySelector("form").addEventListener("submit", function (e) {
         e.preventDefault();
-        if (typeof window.loginSISGOP === "function") {
+        const user = document.getElementById("sisgopLoginUserV3");
+        const password = document.getElementById("sisgopLoginPasswordV3");
+        const message = document.getElementById("sisgopLoginMessageV3");
+        const authUser = document.getElementById("sisgopLoginUser");
+        const authPassword = document.getElementById("sisgopLoginPassword");
+        if (authUser && authPassword && typeof window.loginSISGOP === "function") {
+          authUser.value = user.value;
+          authPassword.value = password.value;
+          window.loginSISGOP();
+        } else if (typeof window.loginSISGOP === "function") {
           window.loginSISGOP();
         } else {
-          document.getElementById("sisgopLoginMessageV3").textContent = "El acceso todavía está cargando. Recarga la página.";
+          message.textContent = "El acceso todavía está cargando. Recarga la página.";
+          message.style.color = "#b44b4b";
         }
       });
     }
