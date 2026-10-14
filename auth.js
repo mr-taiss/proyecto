@@ -2,7 +2,7 @@
 (function () {
   const USERS = [
     ["PEREYRA MARIA RENE","SISGOP001"],["ACUÑA BARRIOS DIANA CAMILA","SISGOP002"],["AGRADA LEZANO JHANA FABIANE","SISGOP003"],["ANIBARRO MONTELLANO MATEO GAEL","SISGOP004"],["APARICIO NAVIA MARIA FERNANDA","SISGOP005"],["ARANCIBIA LLUEN SAMANTA GUADALUPE","SISGOP006"],["AYLLON TELLEZ GABRIELA BELEN","SISGOP007"],["BARRIGA VILLCA LIZETH","SISGOP008"],["BUEZO VALDA MARCELO BENJAMIN","SISGOP009"],["CESPEDES ARANCIBIA FABIO EMMANUEL","SISGOP010"],["CHAMBI ESPINOZA ARIANA AYLIN","SISGOP011"],["CIVERA LOZADA HENRRY MAURICIO","SISGOP012"],["COA LOAYZA NATALIA","SISGOP013"],["COTRINO CHABARRIA ANGELA NATALY","SISGOP014"],["DAZA BARRIENTOS CAMILA DE LOS ANGELES","SISGOP015"],["DAZA MANCILLA ANA EMILIA","SISGOP016"],["DELGADO COPA NATALIA ANDREA","SISGOP017"],["GEMIO FERNANDEZ DIANA BRENDA","SISGOP018"],["GONZALES PANIAGUA DYLAN JEREMY","SISGOP019"],["JESUS SANABRIA IGNACIO ANTONIO","SISGOP020"],["MALDONADO RAMIREZ ANELID ESTHER","SISGOP021"],["MARIN CERVANTES GISSEL PAOLA","SISGOP022"],["MENDEZ CARRASCO IVAN BENIGNO","SISGOP023"],["MONTOYA RAMOS KAMILAH TAIS","SISGOP024"],["OBLITAS CORONADO JUAN SAMUEL","SISGOP025"],["ORTUSTE URQUIZU ANA CECILIA","SISGOP026"],["PARADA GONZALES MARIANA","SISGOP027"],["PEREZ FLORES CARLOS FABIAN","SISGOP028"],["RAMIREZ SIÑANI HUGO JOSE MANUEL","SISGOP029"],["ROCHA LOPEZ ALEJANDRA EDITH","SISGOP030"],["RODRIGUEZ APARICIO SAMANTA","SISGOP031"],["SERRUDO ORTIZ SAMANTA VIOLETA","SISGOP032"],["TEJERINA PACO JUDITH AMAYA","SISGOP033"],["VEDIA DURAN ANTHON SEBASTIAN","SISGOP034"],["VEGA VALDEZ IKER HOLZEN","SISGOP035"],["VILLEGAS ARANCIBIA CAMILA RENATA","SISGOP036"],["ZARCILLO ROJAS ANGELA MARIELA","SISGOP037"]
-  ].map(([name,password]) => ({name,password}));
+  ].map(([name,password]) => ({name,password,course:"6B"}));
 
   const SESSION_KEY = "sisgop_current_user";
   const PASSWORDS_KEY = "sisgop_changed_passwords";
@@ -10,15 +10,18 @@
 
   const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-ZÑ ]/g, " ").replace(/\s+/g, " ").trim();
   const readPasswords = () => { try { return JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}"); } catch { return {}; } };
-  const findUser = value => {
+  const COURSE_LABELS = {"1A":"1.º A","1B":"1.º B","1C":"1.º C","2A":"2.º A","2B":"2.º B","2C":"2.º C","3A":"3.º A","3B":"3.º B","4A":"4.º A","4B":"4.º B","5A":"5.º A · Exactas","5B":"5.º B · Salud","5C":"5.º C · Socio-Económicas","6A":"6.º A · Exactas","6B":"6.º B · Salud","6C":"6.º C · Socio-Económicas"};
+  const COURSE_KEY = "sisgop_current_course";
+  const findUser = (value, course) => {
     const text = normalize(value);
     if (!text) return null;
-    const exact = USERS.find(user => normalize(user.name) === text);
+    const exact = USERS.find(user => normalize(user.name) === text && (!course || user.course === course));
     return exact || null;
   };
   const currentUser = () => {
     const saved = localStorage.getItem(SESSION_KEY);
-    return saved ? findUser(saved) : null;
+    const course = localStorage.getItem(COURSE_KEY) || "6B";
+    return saved ? findUser(saved, course) : null;
   };
   const getPassword = user => readPasswords()[normalize(user.name)] || user.password;
   const hasChangedPassword = user => Object.prototype.hasOwnProperty.call(readPasswords(), normalize(user.name));
@@ -32,7 +35,7 @@
       box = document.createElement("div");
       box.id = "sisgopLoginOverlay";
       box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:linear-gradient(135deg,#edf3fb,#f8fbff);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Segoe UI,Arial,sans-serif";
-      box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(20,40,80,.2)"><div style="text-align:center"><div style="font-size:44px">🔐</div><h1 style="margin:8px 0;color:#14233f">SISGOP</h1><p style="color:#718099;margin-bottom:22px">Acceso personal · 6to B</p></div><form id="sisgopLoginForm"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre completo" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:14px 0 7px">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" required style="width:100%;padding:13px 48px 13px 13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><button type="button" id="sisgopEye" aria-label="Mostrar contraseña" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">ENTRAR AL SISTEMA</button><button type="button" id="sisgopChangePasswordFromLogin" style="width:100%;margin-top:10px;padding:11px;border:1px solid #d7e0eb;border-radius:9px;background:#f5f8fc;color:#245ea8;font-weight:700;cursor:pointer">🔑 Cambiar contraseña</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:11px;border:0;background:transparent;color:#64748b;cursor:pointer">← Volver</button></form></div>`;
+      box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(20,40,80,.2)"><div style="text-align:center"><div style="font-size:44px">🔐</div><h1 style="margin:8px 0;color:#14233f">SISGOP</h1><p style="color:#718099;margin-bottom:22px">Acceso personal · Secundaria</p></div><form id="sisgopLoginForm"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Curso</label><select id="sisgopLoginCourse" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px;background:white"><option value="">Selecciona tu curso</option><option value="1A">1.º A</option><option value="1B">1.º B</option><option value="1C">1.º C</option><option value="2A">2.º A</option><option value="2B">2.º B</option><option value="2C">2.º C</option><option value="3A">3.º A</option><option value="3B">3.º B</option><option value="4A">4.º A</option><option value="4B">4.º B</option><option value="5A">5.º A · Exactas</option><option value="5B">5.º B · Salud</option><option value="5C">5.º C · Socio-Económicas</option><option value="6A">6.º A · Exactas</option><option value="6B">6.º B · Salud</option><option value="6C">6.º C · Socio-Económicas</option></select><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre completo" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:14px 0 7px">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" required style="width:100%;padding:13px 48px 13px 13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><button type="button" id="sisgopEye" aria-label="Mostrar contraseña" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">ENTRAR AL SISTEMA</button><button type="button" id="sisgopChangePasswordFromLogin" style="width:100%;margin-top:10px;padding:11px;border:1px solid #d7e0eb;border-radius:9px;background:#f5f8fc;color:#245ea8;font-weight:700;cursor:pointer">🔑 Cambiar contraseña</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:11px;border:0;background:transparent;color:#64748b;cursor:pointer">← Volver</button></form></div>`;
       document.body.appendChild(box);
       document.getElementById("sisgopEye").onclick = () => {
         const input = document.getElementById("sisgopLoginPassword");
@@ -46,6 +49,7 @@
       };
     }
     box.style.display = "flex";
+    document.getElementById("sisgopLoginCourse").value = "";
     document.getElementById("sisgopLoginUser").value = "";
     document.getElementById("sisgopLoginPassword").value = "";
     document.getElementById("sisgopLoginPassword").type = "password";
@@ -54,12 +58,14 @@
   }
 
   function changePasswordFromLogin() {
-    const user = findUser(document.getElementById("sisgopLoginUser")?.value);
+    const course = document.getElementById("sisgopLoginCourse")?.value;
+    const user = findUser(document.getElementById("sisgopLoginUser")?.value, course);
     const password = document.getElementById("sisgopLoginPassword")?.value || "";
     const message = document.getElementById("sisgopLoginMessage");
     if (!user) { message.textContent = "Nombre no autorizado. Escribe tu nombre completo exactamente como está registrado."; message.style.color = "#b44b4b"; return; }
     if (password !== getPassword(user)) { message.textContent = "Escribe primero tu contraseña actual."; message.style.color = "#b44b4b"; return; }
     localStorage.setItem(SESSION_KEY, user.name);
+    localStorage.setItem(COURSE_KEY, user.course);
     document.getElementById("sisgopLoginOverlay")?.remove();
     showChangePassword(false);
   }
@@ -92,12 +98,15 @@
   }
 
   function login() {
-    const user = findUser(document.getElementById("sisgopLoginUser")?.value);
+    const course = document.getElementById("sisgopLoginCourse")?.value;
+    const user = findUser(document.getElementById("sisgopLoginUser")?.value, course);
     const password = document.getElementById("sisgopLoginPassword")?.value || "";
     const message = document.getElementById("sisgopLoginMessage");
-    if (!user) { message.textContent = "Nombre no autorizado."; message.style.color = "#b44b4b"; return; }
+    if (!course) { message.textContent = "Selecciona tu curso."; message.style.color = "#b44b4b"; return; }
+    if (!user) { message.textContent = course === "6B" ? "Nombre no autorizado para 6.º B." : "La lista de estudiantes de este curso todavía no está cargada."; message.style.color = "#b44b4b"; return; }
     if (password !== getPassword(user)) { message.textContent = "Usuario o contraseña incorrectos."; message.style.color = "#b44b4b"; return; }
     localStorage.setItem(SESSION_KEY, user.name);
+    localStorage.setItem(COURSE_KEY, user.course);
     document.getElementById("sisgopLoginOverlay")?.remove();
     if (!hasChangedPassword(user)) { showChangePassword(true); return; }
     enterHome();
@@ -106,11 +115,14 @@
   function enterHome() {
     document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
     document.getElementById("homeScreen")?.classList.add("active");
+    const courseLabel = document.getElementById("activeCourseLabel");
+    if (courseLabel) courseLabel.textContent = COURSE_LABELS[localStorage.getItem(COURSE_KEY) || "6B"] || "SECUNDARIA";
     if (typeof window.updateAll === "function") window.updateAll();
   }
 
   function logout() {
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(COURSE_KEY);
     document.getElementById("sisgopPasswordOverlay")?.remove();
     document.getElementById("sisgopLoginOverlay")?.remove();
     showLogin();
