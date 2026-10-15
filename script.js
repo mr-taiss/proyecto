@@ -123,16 +123,16 @@ function updateStatistics(){const l=objects.filter(o=>o.status==="Perdido").leng
 function statusHTML(s){const c=s==="Perdido"?"perdido":s==="Encontrado"?"encontrado":"recuperado",sym=s==="Perdido"?"•":s==="Encontrado"?"✓":"↗";return `<span class="status ${c}">${sym} ${s}</span>`}
 function formatDate(d){if(!d)return"-";const p=d.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
 function createTableRow(o){
-  let a='<button class="table-action" onclick="viewDetails(\\''+o.id+'\\')">Ver</button>';
-  if(publicSearchMode)return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+  const id=escapeHTML(o.id),name=escapeHTML(o.name);
+  let actions=`<button class="table-action" onclick="viewDetails('${id}')">Ver</button>`;
+  if(publicSearchMode)return `<tr><td>${id}</td><td><strong>${name}</strong></td><td>${formatDate(o.date)}</td><td>${escapeHTML(o.place)}</td><td>${statusHTML(o.status)}</td><td>${actions}</td></tr>`;
   const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();
   const user=typeof window.currentSISGOPUser==="function"?window.currentSISGOPUser():null;
   const canManage=admin||(user&&o.owner===user.name);
-  if(!canManage)return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
-  if(admin&&o.status==='Perdido')a+='<button class="table-action found" onclick="markFound(\\''+o.id+'\\')">Encontrado</button>';
-  if(admin&&o.status==='Encontrado')a+='<button class="table-action recover" onclick="markRecovered(\\''+o.id+'\\')">Recuperado</button>';
-  a+='<button class="table-action edit" onclick="editObject(\\''+o.id+'\\')">Editar</button><button class="table-action delete" onclick="deleteObject(\\''+o.id+'\\')">Eliminar</button>';
-  return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+  if(canManage&&admin&&o.status==="Perdido")actions+=`<button class="table-action found" onclick="markFound('${id}')">Encontrado</button>`;
+  if(canManage&&admin&&o.status==="Encontrado")actions+=`<button class="table-action recover" onclick="markRecovered('${id}')">Recuperado</button>`;
+  if(canManage)actions+=`<button class="table-action edit" onclick="editObject('${id}')">Editar</button><button class="table-action delete" onclick="deleteObject('${id}')">Eliminar</button>`;
+  return `<tr><td>${id}</td><td><strong>${name}</strong></td><td>${formatDate(o.date)}</td><td>${escapeHTML(o.place)}</td><td>${statusHTML(o.status)}</td><td>${actions}</td></tr>`;
 }
 function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();let list=[...objects];if(!admin)list=list.filter(o=>o.status==="Perdido");if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
 function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
