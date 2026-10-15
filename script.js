@@ -38,7 +38,7 @@ function openStudentProfile(){
   const user=typeof window.currentSISGOPUser==='function'?window.currentSISGOPUser():null;
   if(!user){if(typeof window.showSISGOPLogin==='function')window.showSISGOPLogin();return;}
   const mine=objects.filter(o=>o.owner===user.name),content=document.getElementById('profileContent');if(!content)return;
-  let html='<div class="profile-summary"><h2>'+escapeHTML(user.name)+'</h2><p><strong>Curso:</strong> '+escapeHTML(user.course||'6B')+'</p><p><strong>Objetos registrados:</strong> '+mine.length+'</p></div><div class="profile-history"><h3>Mis registros e historial</h3>';
+  let html='<div class="profile-summary"><h2>'+escapeHTML(user.name)+'</h2><p><strong>Objetos registrados:</strong> '+mine.length+'</p></div><div class="profile-history"><h3>Mis registros e historial</h3>';
   if(!mine.length)html+='<p>Todavía no registraste objetos con esta cuenta.</p>';
   mine.forEach(o=>{html+='<article class="history-item"><strong>'+escapeHTML(o.name)+'</strong> · '+escapeHTML(o.status)+'<p>'+escapeHTML(o.place)+' · '+formatDate(o.date)+'</p>';(o.history||[]).forEach(h=>{html+='<p>'+escapeHTML(h.date)+' — '+escapeHTML(h.message)+'</p>';});html+='</article>';});
   content.innerHTML=html+'</div>';showScreen('profileScreen');
@@ -87,7 +87,7 @@ function setupStudentRecognition(){
     if(!input.value.trim()){input.setCustomValidity("");return}
     const recognized=recognizeStudent(input.value);
     if(recognized){input.value=recognized;input.setCustomValidity("")}
-    else{input.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to B.");}
+    else{input.setCustomValidity("El estudiante no está registrado. Escribe un nombre completo que esté registrado en el sistema.");}
   });
   input.addEventListener("input",()=>{input.setCustomValidity("")});
 }
@@ -137,7 +137,7 @@ function createTableRow(o){
 }
 function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();let list=[...objects];if(!admin)list=list.filter(o=>o.status==="Perdido");if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
 function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
-function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value,admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();const results=objects.filter(o=>(admin||publicSearchMode||o.status==="Perdido")&&`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
+function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value,admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();const results=objects.filter(o=>(admin||o.status==="Perdido")&&`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
 function markFound(id){if(!(typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin())){showToast("Solo el administrador puede cambiar el estado del objeto.","error");return}const o=objects.find(x=>x.id===id);if(!o)return;o.status="Encontrado";addHistory(o,"El objeto fue marcado como encontrado.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como encontrado.` ,"success");viewDetails(id)}
 function markRecovered(id){if(!(typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin())){showToast("Solo el administrador puede cambiar el estado del objeto.","error");return}const o=objects.find(x=>x.id===id);if(!o)return;if(o.status!=="Encontrado"){showToast("El objeto debe estar encontrado primero.","error");return}if(!confirm(`¿Confirmas que "${o.name}" fue entregado a su dueño?`))return;o.status="Recuperado";addHistory(o,"El objeto fue entregado a su dueño.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como recuperado.` ,"success");viewDetails(id)}
 
