@@ -12,13 +12,13 @@
 @media(max-width:650px){#sisgopUserBadge{top:10px!important;right:10px!important;max-width:calc(100vw - 20px)!important;padding:9px 11px!important;gap:6px!important}#sisgopUserBadge strong{width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important}#sisgopUserBadge button{padding:6px 8px!important}}
 
 
-/* Fondo fotográfico oficial de Don Bosco Sucre para SISGOP */
+/* Fondo de fachada azul del Colegio Don Bosco elegido para SISGOP */
 #welcomeScreen,
 #homeScreen,
 .internal-page {
   background-image:
     linear-gradient(rgba(12, 25, 48, 0.48), rgba(12, 25, 48, 0.58)),
-    url("https://donboscosucre.edu.bo/_next/image?q=75&url=%2Fimgs%2FNews-Destacados-Abanderados.webp&w=1920") !important;
+    url("https://1.bp.blogspot.com/_j2oK-QGefwA/TIgpgI4O1pI/AAAAAAAAAfA/tXg6M3Xo-sg/s1600/2.JPG") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
