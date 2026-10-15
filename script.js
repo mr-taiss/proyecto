@@ -34,6 +34,15 @@ function openPublicSearch(){
   if(input)input.value=''; if(status)status.value='Todos'; if(back)back.textContent='← Volver a portada';
   searchObjects();showScreen('searchScreen');
 }
+function openStudentProfile(){
+  const user=typeof window.currentSISGOPUser==='function'?window.currentSISGOPUser():null;
+  if(!user){if(typeof window.showSISGOPLogin==='function')window.showSISGOPLogin();return;}
+  const mine=objects.filter(o=>o.owner===user.name),content=document.getElementById('profileContent');if(!content)return;
+  let html='<div class="profile-summary"><h2>'+escapeHTML(user.name)+'</h2><p><strong>Curso:</strong> '+escapeHTML(user.course||'6B')+'</p><p><strong>Objetos registrados:</strong> '+mine.length+'</p></div><div class="profile-history"><h3>Mis registros e historial</h3>';
+  if(!mine.length)html+='<p>Todavía no registraste objetos con esta cuenta.</p>';
+  mine.forEach(o=>{html+='<article class="history-item"><strong>'+escapeHTML(o.name)+'</strong> · '+escapeHTML(o.status)+'<p>'+escapeHTML(o.place)+' · '+formatDate(o.date)+'</p>';(o.history||[]).forEach(h=>{html+='<p>'+escapeHTML(h.date)+' — '+escapeHTML(h.message)+'</p>';});html+='</article>';});
+  content.innerHTML=html+'</div>';showScreen('profileScreen');
+}
 function openAdminAccess(){
   alert('El acceso administrativo necesita autenticación y permisos verificados en un servidor. Este prototipo guarda los datos en el navegador; falta configurar un backend con base de datos y roles para habilitar un panel administrativo seguro.');
 }
@@ -110,7 +119,14 @@ function updateAll(){updateStatistics();renderObjects();searchObjects();renderNo
 function updateStatistics(){const l=objects.filter(o=>o.status==="Perdido").length,f=objects.filter(o=>o.status==="Encontrado").length,r=objects.filter(o=>o.status==="Recuperado").length;document.getElementById("lostCount").textContent=l;document.getElementById("foundCount").textContent=f;document.getElementById("recoveredCount").textContent=r;const n=f,b=document.getElementById("notificationBadge");b.textContent=n;b.classList.toggle("zero",n===0)}
 function statusHTML(s){const c=s==="Perdido"?"perdido":s==="Encontrado"?"encontrado":"recuperado",sym=s==="Perdido"?"•":s==="Encontrado"?"✓":"↗";return `<span class="status ${c}">${sym} ${s}</span>`}
 function formatDate(d){if(!d)return"-";const p=d.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
-function createTableRow(o){let a=`<button class="table-action" onclick="viewDetails('${o.id}')">Ver</button>`;if(o.status==="Perdido")a+=`<button class="table-action found" onclick="markFound('${o.id}')">Encontrado</button>`;if(o.status==="Encontrado")a+=`<button class="table-action recover" onclick="markRecovered('${o.id}')">Recuperado</button>`;a+=`<button class="table-action edit" onclick="editObject('${o.id}')">Editar</button><button class="table-action delete" onclick="deleteObject('${o.id}')">Eliminar</button>`;return `<tr><td>${escapeHTML(o.id)}</td><td><strong>${escapeHTML(o.name)}</strong></td><td>${formatDate(o.date)}</td><td>${escapeHTML(o.place)}</td><td>${statusHTML(o.status)}</td><td>${a}</td></tr>`}
+function createTableRow(o){
+  let a='<button class="table-action" onclick="viewDetails(\''+o.id+'\')">Ver</button>';
+  if(publicSearchMode)return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+  if(o.status==='Perdido')a+='<button class="table-action found" onclick="markFound(\''+o.id+'\')">Encontrado</button>';
+  if(o.status==='Encontrado')a+='<button class="table-action recover" onclick="markRecovered(\''+o.id+'\')">Recuperado</button>';
+  a+='<button class="table-action edit" onclick="editObject(\''+o.id+'\')">Editar</button><button class="table-action delete" onclick="deleteObject(\''+o.id+'\')">Eliminar</button>';
+  return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+}
 function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;let list=[...objects];if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
 function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
 function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value;const results=objects.filter(o=>`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
