@@ -186,6 +186,7 @@
     if (courseLabel) { courseLabel.textContent = isAdmin ? (localStorage.getItem("sisgop_admin_profile") || "ADMINISTRACIÓN").toUpperCase() : ""; courseLabel.style.display = isAdmin ? "" : "none"; }
     const profileCard = document.querySelector(".menu-card.profile");
     if (profileCard) profileCard.style.display = isAdmin ? "none" : "";
+    const adminPasswordCard = document.getElementById("sisgopAdminPasswordCard"); if (adminPasswordCard) adminPasswordCard.style.display = isAdmin ? "" : "none";
     const intro = document.querySelector("#homeScreen .dashboard-intro p");
     if (intro) intro.textContent = isAdmin ? "Panel administrativo: consulta y gestiona todos los objetos registrados." : "Selecciona una de las opciones para gestionar los objetos del curso.";
     if (typeof window.updateAll === "function") window.updateAll();
