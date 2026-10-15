@@ -44,7 +44,8 @@ function openStudentProfile(){
   content.innerHTML=html+'</div>';showScreen('profileScreen');
 }
 function openAdminAccess(){
-  alert('El acceso administrativo necesita autenticación y permisos verificados en un servidor. Este prototipo guarda los datos en el navegador; falta configurar un backend con base de datos y roles para habilitar un panel administrativo seguro.');
+  if(typeof window.showSISGOPAdminLogin==='function') window.showSISGOPAdminLogin();
+  else alert('No se pudo cargar el acceso de administrador. Recarga la página.');
 }
 function openRegister(){resetForm();showScreen("registerScreen")}
 function openSearch(){document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";searchObjects();showScreen("searchScreen")}
