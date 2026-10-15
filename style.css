@@ -12,15 +12,13 @@
 @media(max-width:650px){#sisgopUserBadge{top:10px!important;right:10px!important;max-width:calc(100vw - 20px)!important;padding:9px 11px!important;gap:6px!important}#sisgopUserBadge strong{width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important}#sisgopUserBadge button{padding:6px 8px!important}}
 
 
-/* Fondo de fachada azul del Colegio Don Bosco elegido para SISGOP */
+/* Fondo SISGOP: preparado para la foto local patio-donbosco.jpg */
 #welcomeScreen,
 #homeScreen,
 .internal-page {
-  background-image:
-    linear-gradient(rgba(12, 25, 48, 0.48), rgba(12, 25, 48, 0.58)),
-    url("https://www.instagram.com/p/C3Az8paAaqm/media/?size=l") !important;
+  background-image: url("./patio-donbosco.jpg") !important;
   background-size: cover !important;
-  background-position: center !important;
+  background-position: center center !important;
   background-repeat: no-repeat !important;
   background-attachment: fixed !important;
 }
