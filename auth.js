@@ -30,19 +30,60 @@
   const hasChangedPassword = user => Object.prototype.hasOwnProperty.call(readPasswords(), normalize(user.name));
 
   function showAdminLogin() {
-    const username = prompt("Acceso de administrador\\nUsuario:");
-    if (username === null) return;
-    const password = prompt("Contraseña de administrador:");
-    if (password === null) return;
-    if (username.trim() !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-      alert("Usuario o contraseña incorrectos.");
-      return;
-    }
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(COURSE_KEY);
-    localStorage.setItem(ADMIN_SESSION_KEY, "1");
+    document.getElementById("sisgopAdminOverlay")?.remove();
     document.getElementById("sisgopLoginOverlay")?.remove();
-    enterHome();
+    document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+    const box = document.createElement("section");
+    box.id = "sisgopAdminOverlay";
+    box.className = "sisgop-admin-overlay";
+    box.innerHTML = `
+      <div class="admin-login-card">
+        <button type="button" class="admin-close" id="sisgopAdminBack" aria-label="Volver a portada">×</button>
+        <div class="admin-emblem"><span>SG</span><i>✓</i></div>
+        <p class="admin-eyebrow">SISGOP · SECUNDARIA</p>
+        <h1>Acceso administrativo</h1>
+        <p class="admin-subtitle">Ingresa tus credenciales para gestionar los objetos registrados.</p>
+        <form id="sisgopAdminForm" class="admin-login-form">
+          <label for="sisgopAdminUser">Usuario</label>
+          <div class="admin-input-wrap"><span aria-hidden="true">♙</span><input id="sisgopAdminUser" autocomplete="username" required placeholder="Usuario administrador"></div>
+          <label for="sisgopAdminPassword">Contraseña</label>
+          <div class="admin-input-wrap"><span aria-hidden="true">⌑</span><input id="sisgopAdminPassword" type="password" autocomplete="current-password" required placeholder="Escribe tu contraseña"><button type="button" id="sisgopAdminEye" aria-label="Mostrar contraseña">◉</button></div>
+          <p id="sisgopAdminMessage" class="admin-login-message" role="status"></p>
+          <button type="submit" class="admin-submit">Entrar al panel <span>→</span></button>
+        </form>
+        <div class="admin-security-note"><span>⌑</span><p>Acceso reservado para la administración del sistema.</p></div>
+        <button type="button" class="admin-return-link" id="sisgopAdminCancel">← Volver a la portada</button>
+      </div>`;
+    document.body.appendChild(box);
+    const goBack = () => {
+      box.remove();
+      document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+      document.getElementById("welcomeScreen")?.classList.add("active");
+    };
+    document.getElementById("sisgopAdminBack").onclick = goBack;
+    document.getElementById("sisgopAdminCancel").onclick = goBack;
+    document.getElementById("sisgopAdminEye").onclick = () => {
+      const input = document.getElementById("sisgopAdminPassword");
+      input.type = input.type === "password" ? "text" : "password";
+    };
+    document.getElementById("sisgopAdminForm").onsubmit = event => {
+      event.preventDefault();
+      const username = document.getElementById("sisgopAdminUser").value.trim();
+      const password = document.getElementById("sisgopAdminPassword").value;
+      const message = document.getElementById("sisgopAdminMessage");
+      if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+        message.textContent = "El usuario o la contraseña no son correctos. Inténtalo de nuevo.";
+        message.classList.add("visible");
+        document.getElementById("sisgopAdminPassword").value = "";
+        return;
+      }
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(COURSE_KEY);
+      localStorage.setItem(ADMIN_SESSION_KEY, "1");
+      box.remove();
+      enterHome();
+    };
+    document.getElementById("sisgopAdminUser").focus();
   }
 
   function showLogin() {
