@@ -176,6 +176,8 @@
     enterHome();
   }
 
+  function adminChangeStudentPassword() { if (localStorage.getItem(ADMIN_SESSION_KEY) !== "1") return; const name = prompt("Nombre completo del estudiante:"); if (!name) return; const student = findUser(name, null); if (!student) { alert("Estudiante no encontrado."); return; } const a = prompt("Nueva contraseña (mínimo 6 caracteres):"); if (a === null) return; if (a.length < 6) { alert("Debe tener al menos 6 caracteres."); return; } const b = prompt("Confirma la nueva contraseña:"); if (a !== b) { alert("Las contraseñas no coinciden."); return; } const passwords = readPasswords(); passwords[normalize(student.name)] = a; localStorage.setItem(PASSWORDS_KEY, JSON.stringify(passwords)); alert("Contraseña actualizada para " + student.name); }
+
   function enterHome() {
     document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
     document.getElementById("homeScreen")?.classList.add("active");
