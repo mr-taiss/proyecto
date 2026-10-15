@@ -129,8 +129,8 @@ function createTableRow(o){
   const user=typeof window.currentSISGOPUser==="function"?window.currentSISGOPUser():null;
   const canManage=admin||(user&&o.owner===user.name);
   if(!canManage)return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
-  if(o.status==='Perdido')a+='<button class="table-action found" onclick="markFound(\\''+o.id+'\\')">Encontrado</button>';
-  if(o.status==='Encontrado')a+='<button class="table-action recover" onclick="markRecovered(\\''+o.id+'\\')">Recuperado</button>';
+  if(admin&&o.status==='Perdido')a+='<button class="table-action found" onclick="markFound(\\''+o.id+'\\')">Encontrado</button>';
+  if(admin&&o.status==='Encontrado')a+='<button class="table-action recover" onclick="markRecovered(\\''+o.id+'\\')">Recuperado</button';
   a+='<button class="table-action edit" onclick="editObject(\\''+o.id+'\\')">Editar</button><button class="table-action delete" onclick="deleteObject(\\''+o.id+'\\')">Eliminar</button>';
   return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
 }
