@@ -1,6 +1,6 @@
 /* SISGOP - gestion de objetos perdidos */
 const STORAGE_KEY="sisgop_objects";
-let objects=[],editingId=null,currentFilter="Todos",currentImage="";
+let objects=[],editingId=null,currentFilter="Todos",currentImage="",publicSearchMode=false;
 
 const OBJECT_OPTIONS={
   "Prendas":["Chompa","Polera","Pantalón","Falda","Camisa","Chaqueta","Abrigo","Gorra","Medias","Bufanda"],
@@ -28,6 +28,15 @@ function showScreen(id){document.querySelectorAll(".page").forEach(p=>p.classLis
 function enterSystem(){updateAll();showScreen("homeScreen")}
 function returnToWelcome(){showScreen("welcomeScreen")}
 function openHome(){updateAll();showScreen("homeScreen")}
+function openPublicSearch(){
+  publicSearchMode=true;
+  const input=document.getElementById('searchInput'),status=document.getElementById('searchStatus'),back=document.getElementById('searchBackButton');
+  if(input)input.value=''; if(status)status.value='Todos'; if(back)back.textContent='← Volver a portada';
+  searchObjects();showScreen('searchScreen');
+}
+function openAdminAccess(){
+  alert('El acceso administrativo necesita autenticación y permisos verificados en un servidor. Este prototipo guarda los datos en el navegador; falta configurar un backend con base de datos y roles para habilitar un panel administrativo seguro.');
+}
 function openRegister(){resetForm();showScreen("registerScreen")}
 function openSearch(){document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";searchObjects();showScreen("searchScreen")}
 function openObjects(){currentFilter="Todos";document.querySelectorAll(".filter-button").forEach(b=>b.classList.remove("active"));const f=document.querySelector(".filter-button");if(f)f.classList.add("active");renderObjects();showScreen("objectsScreen")}
