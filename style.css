@@ -25,3 +25,31 @@
 .application {
   background: rgba(255, 255, 255, 0.92);
 }
+
+
+/* Mejor contraste de textos sobre la fotografía en blanco y negro */
+:root {
+  --dark: #142B4A;
+  --dark-two: #1D3155;
+  --text: #172033;
+  --muted: #39465A;
+}
+.welcome-content {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  box-shadow: 0 12px 35px rgba(20, 43, 74, 0.12);
+}
+.school-label,
+.welcome-content h2,
+.backpack-entry span,
+.welcome-info span,
+.internal-header span,
+.internal-header h1 {
+  color: #142B4A;
+}
+.welcome-content p,
+.dashboard-intro p,
+.dashboard-intro span {
+  color: #303B4D;
+}
