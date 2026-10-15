@@ -42,8 +42,10 @@
         <div class="admin-emblem"><span>SG</span><i>✓</i></div>
         <p class="admin-eyebrow">SISGOP · SECUNDARIA</p>
         <h1>Acceso administrativo</h1>
-        <p class="admin-subtitle">Ingresa tus credenciales para gestionar los objetos registrados.</p>
+        <p class="admin-subtitle">Selecciona tu perfil e ingresa tus credenciales para gestionar los objetos registrados.</p>
         <form id="sisgopAdminForm" class="admin-login-form">
+          <label for="sisgopAdminProfile">Perfil de acceso</label>
+          <div class="admin-input-wrap"><span aria-hidden="true">♙</span><select id="sisgopAdminProfile" required style="width:100%;min-width:0;border:0;outline:0;background:transparent;color:#243b57;font:13px Segoe UI,Arial,sans-serif"><option value="">Selecciona un perfil</option><option value="Regente">Regente</option><option value="Director">Director</option><option value="Padre director">Padre director</option></select></div>
           <label for="sisgopAdminUser">Usuario</label>
           <div class="admin-input-wrap"><span aria-hidden="true">♙</span><input id="sisgopAdminUser" autocomplete="username" required placeholder="Usuario administrador"></div>
           <label for="sisgopAdminPassword">Contraseña</label>
@@ -80,6 +82,7 @@
       localStorage.removeItem(SESSION_KEY);
       localStorage.removeItem(COURSE_KEY);
       localStorage.setItem(ADMIN_SESSION_KEY, "1");
+      localStorage.setItem("sisgop_admin_profile", document.getElementById("sisgopAdminProfile").value);
       box.remove();
       enterHome();
     };
@@ -95,7 +98,7 @@
       box = document.createElement("div");
       box.id = "sisgopLoginOverlay";
       box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:linear-gradient(135deg,#edf3fb,#f8fbff);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Segoe UI,Arial,sans-serif";
-      box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(20,40,80,.2)"><div style="text-align:center"><div style="font-size:44px">🔐</div><h1 style="margin:8px 0;color:#14233f">SISGOP</h1><p style="color:#718099;margin-bottom:22px">Acceso personal · Secundaria</p></div><form id="sisgopLoginForm"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Curso</label><select id="sisgopLoginCourse" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px;background:white"><option value="">Selecciona tu curso</option><option value="1A">1.º A</option><option value="1B">1.º B</option><option value="1C">1.º C</option><option value="2A">2.º A</option><option value="2B">2.º B</option><option value="2C">2.º C</option><option value="3A">3.º A</option><option value="3B">3.º B</option><option value="4A">4.º A</option><option value="4B">4.º B</option><option value="5A">5.º A · Exactas</option><option value="5B">5.º B · Salud</option><option value="5C">5.º C · Socio-Económicas</option><option value="6A">6.º A · Exactas</option><option value="6B">6.º B · Salud</option><option value="6C">6.º C · Socio-Económicas</option></select><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre completo" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:14px 0 7px">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" required style="width:100%;padding:13px 48px 13px 13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><button type="button" id="sisgopEye" aria-label="Mostrar contraseña" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">ENTRAR AL SISTEMA</button><button type="button" id="sisgopChangePasswordFromLogin" style="width:100%;margin-top:10px;padding:11px;border:1px solid #d7e0eb;border-radius:9px;background:#f5f8fc;color:#245ea8;font-weight:700;cursor:pointer">🔑 Cambiar contraseña</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:11px;border:0;background:transparent;color:#64748b;cursor:pointer">← Volver</button></form></div>`;
+      box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(20,40,80,.2)"><div style="text-align:center"><div style="font-size:44px">🔐</div><h1 style="margin:8px 0;color:#14233f">SISGOP</h1><p style="color:#718099;margin-bottom:22px">Acceso personal · Secundaria</p></div><form id="sisgopLoginForm"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Curso</label><select id="sisgopLoginCourse" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px;background:white"><option value="">Selecciona tu curso</option><option value="1A">1.º A</option><option value="1B">1.º B</option><option value="1C">1.º C</option><option value="2A">2.º A</option><option value="2B">2.º B</option><option value="2C">2.º C</option><option value="3A">3.º A</option><option value="3B">3.º B</option><option value="4A">4.º A</option><option value="4B">4.º B</option><option value="5A">5.º A · Exactas</option><option value="5B">5.º B · Salud</option><option value="5C">5.º C · Socio-Económicas</option><option value="6A">6.º A · Exactas</option><option value="6B">6.º B · Salud</option><option value="6C">6.º C · Socio-Económicas</option></select><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:12px 0 7px">Estudiante</label><input id="sisgopLoginUser" autocomplete="username" placeholder="Escribe tu nombre completo" required style="width:100%;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><label style="display:block;font-weight:700;font-size:13px;color:#334155;margin:14px 0 7px">Contraseña</label><div style="position:relative"><input id="sisgopLoginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" required style="width:100%;padding:13px 48px 13px 13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box;font-size:14px"><button type="button" id="sisgopEye" aria-label="Mostrar contraseña" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:20px">👁️</button></div><div id="sisgopLoginMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">ENTRAR AL SISTEMA</button><button type="button" id="sisgopChangePasswordFromLogin" style="width:100%;margin-top:10px;padding:11px;border:1px solid #d7e0eb;border-radius:9px;background:#f5f8fc;color:#245ea8;font-weight:700;cursor:pointer">🔑 Cambiar contraseña</button><button type="button" id="sisgopForgotPassword" style="width:100%;margin-top:8px;padding:10px;border:0;background:transparent;color:#245ea8;font-weight:700;cursor:pointer">Olvidé mi contraseña</button><button type="button" id="sisgopLoginBack" style="width:100%;margin-top:10px;padding:11px;border:0;background:transparent;color:#64748b;cursor:pointer">← Volver</button></form></div>`;
       document.body.appendChild(box);
       document.getElementById("sisgopEye").onclick = () => {
         const input = document.getElementById("sisgopLoginPassword");
@@ -103,6 +106,7 @@
       };
       document.getElementById("sisgopLoginForm").onsubmit = event => { event.preventDefault(); login(); };
       document.getElementById("sisgopChangePasswordFromLogin").onclick = changePasswordFromLogin;
+      document.getElementById("sisgopForgotPassword").onclick = resetForgottenPassword;
       document.getElementById("sisgopLoginBack").onclick = () => {
         box.remove();
         document.getElementById("welcomeScreen")?.classList.add("active");
@@ -130,6 +134,18 @@
     showChangePassword(false);
   }
 
+  function resetForgottenPassword() {
+    const course = document.getElementById("sisgopLoginCourse")?.value;
+    const user = findUser(document.getElementById("sisgopLoginUser")?.value, course);
+    const message = document.getElementById("sisgopLoginMessage");
+    if (!course) { message.textContent = "Selecciona tu curso para recuperar el acceso."; message.style.color = "#b44b4b"; return; }
+    if (!user) { message.textContent = "No encontramos ese nombre en el curso seleccionado. Revisa el nombre completo."; message.style.color = "#b44b4b"; return; }
+    localStorage.setItem(SESSION_KEY, user.name);
+    localStorage.setItem(COURSE_KEY, user.course);
+    document.getElementById("sisgopLoginOverlay")?.remove();
+    showChangePassword(true);
+  }
+
   function showChangePassword(force) {
     const user = currentUser();
     if (!user) { showLogin(); return; }
@@ -137,7 +153,7 @@
     const box = document.createElement("div");
     box.id = "sisgopPasswordOverlay";
     box.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(15,30,55,.62);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Segoe UI,Arial,sans-serif";
-    box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(0,0,0,.25)"><div style="text-align:center"><div style="font-size:40px">🔑</div><h2 style="color:#14233f;margin:8px 0">${force ? "Crea tu nueva contraseña" : "Cambiar contraseña"}</h2><p style="color:#718099;font-size:13px;line-height:1.5">${force ? "Debes cambiar la contraseña inicial antes de continuar." : "Escribe una nueva contraseña para tu cuenta."}</p></div><form id="sisgopPasswordForm"><input id="sisgopNewPassword" type="password" minlength="6" required placeholder="Nueva contraseña (mínimo 6)" style="width:100%;margin-top:18px;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box"><input id="sisgopConfirmPassword" type="password" minlength="6" required placeholder="Repite la contraseña" style="width:100%;margin-top:10px;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box"><div id="sisgopPasswordMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">GUARDAR CONTRASEÑA</button>${force ? "" : "<button type=\"button\" id=\"sisgopPasswordBack\" style=\"width:100%;margin-top:10px;padding:10px;border:0;background:transparent;color:#64748b;cursor:pointer\">← Volver al acceso</button>"}</form></div>`;
+    box.innerHTML = `<div style="width:min(430px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(0,0,0,.25)"><div style="text-align:center"><div style="font-size:40px">🔑</div><h2 style="color:#14233f;margin:8px 0">${force ? "Crea tu nueva contraseña" : "Cambiar contraseña"}</h2><p style="color:#718099;font-size:13px;line-height:1.5">${force ? "Debes cambiar la contraseña inicial antes de continuar." : "Escribe una nueva contraseña para tu cuenta."}</p></div><form id="sisgopPasswordForm"><input id="sisgopNewPassword" type="password" minlength="6" required placeholder="Nueva contraseña (mínimo 6)" style="width:100%;margin-top:18px;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box"><label for="sisgopConfirmPassword" style="display:block;margin-top:12px;color:#334155;font-size:12px;font-weight:700">Confirmar nueva contraseña</label><input id="sisgopConfirmPassword" type="password" minlength="6" required placeholder="Vuelve a escribir la nueva contraseña" style="width:100%;margin-top:7px;padding:13px;border:1px solid #ccd5e0;border-radius:9px;box-sizing:border-box"><div id="sisgopPasswordMessage" style="min-height:22px;margin:12px 0;font-size:13px"></div><button type="submit" style="width:100%;padding:13px;border:0;border-radius:9px;background:#14233f;color:#fff;font-weight:700;cursor:pointer">GUARDAR CONTRASEÑA</button>${force ? "" : "<button type=\"button\" id=\"sisgopPasswordBack\" style=\"width:100%;margin-top:10px;padding:10px;border:0;background:transparent;color:#64748b;cursor:pointer\">← Volver al acceso</button>"}</form></div>`;
     document.body.appendChild(box);
     document.getElementById("sisgopPasswordForm").onsubmit = event => {
       event.preventDefault();
@@ -177,7 +193,7 @@
     document.getElementById("homeScreen")?.classList.add("active");
     const courseLabel = document.getElementById("activeCourseLabel");
     const isAdmin = localStorage.getItem(ADMIN_SESSION_KEY) === "1";
-    if (courseLabel) courseLabel.textContent = isAdmin ? "ADMINISTRADOR" : (COURSE_LABELS[localStorage.getItem(COURSE_KEY) || "6B"] || "SECUNDARIA");
+    if (courseLabel) { courseLabel.textContent = isAdmin ? (localStorage.getItem("sisgop_admin_profile") || "ADMINISTRACIÓN").toUpperCase() : ""; courseLabel.style.display = isAdmin ? "" : "none"; }
     const profileCard = document.querySelector(".menu-card.profile");
     if (profileCard) profileCard.style.display = isAdmin ? "none" : "";
     const intro = document.querySelector("#homeScreen .dashboard-intro p");
@@ -188,6 +204,7 @@
   function logout() {
     if (localStorage.getItem(ADMIN_SESSION_KEY) === "1") {
       localStorage.removeItem(ADMIN_SESSION_KEY);
+      localStorage.removeItem("sisgop_admin_profile");
       document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
       document.getElementById("welcomeScreen")?.classList.add("active");
       return;
