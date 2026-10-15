@@ -96,7 +96,9 @@ function setupImagePreview(){const i=document.getElementById("objectImage");if(!
 
 function saveObject(e){
   e.preventDefault();
-  const status=document.getElementById("objectStatus").value;
+  const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();
+  const user=typeof window.currentSISGOPUser==="function"?window.currentSISGOPUser():null;
+  const status=admin?document.getElementById("objectStatus").value:"Perdido";
   const category=document.getElementById("objectCategory").value;
   const name=document.getElementById("objectName").value.trim();
   const description=document.getElementById("objectDescription").value.trim();
@@ -110,8 +112,8 @@ function saveObject(e){
   if(studentText&&!student){studentInput.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to B.");studentInput.reportValidity();showToast("El estudiante no está registrado.","error");return}
   studentInput.value=student||"";studentInput.setCustomValidity("");
 
-  if(editingId!==null){const o=objects.find(x=>x.id===editingId);if(!o)return;o.status=status;o.category=category;o.name=name;o.description=description;o.date=date;o.place=place;o.student=student||"";if(currentImage)o.image=currentImage;addHistory(o,"Información del objeto editada.");saveObjects();updateAll();showToast("Objeto actualizado correctamente.","success");openObjects();return}
-  const o={id:generateId(),name,category,description,date,place,student:student||"",image:currentImage,status,createdAt:new Date().toISOString(),history:[]};addHistory(o,`Objeto registrado como ${status}.`);objects.push(o);saveObjects();updateAll();showToast("Objeto registrado correctamente.","success");resetForm();openObjects()
+  if(editingId!==null){const o=objects.find(x=>x.id===editingId);if(!o)return;o.status=admin?status:"Perdido";o.category=category;o.name=name;o.description=description;o.date=date;o.place=place;o.student=student||"";if(currentImage)o.image=currentImage;addHistory(o,"Información del objeto editada.");saveObjects();updateAll();showToast("Objeto actualizado correctamente.","success");openObjects();return}
+  const o={id:generateId(),name,category,description,date,place,student:student||"",image:currentImage,status,owner:user?user.name:"",createdAt:new Date().toISOString(),history:[]};addHistory(o,`Objeto registrado como ${status}.`);objects.push(o);saveObjects();updateAll();showToast("Objeto registrado correctamente.","success");resetForm();openObjects()
 }
 
 function generateId(){if(!objects.length)return"001";return String(Math.max(...objects.map(o=>parseInt(o.id)||0))+1).padStart(3,"0")}
@@ -132,9 +134,9 @@ function createTableRow(o){
   a+='<button class="table-action edit" onclick="editObject(\\''+o.id+'\\')">Editar</button><button class="table-action delete" onclick="deleteObject(\\''+o.id+'\\')">Eliminar</button>';
   return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
 }
-function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;let list=[...objects];if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
+function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();let list=[...objects];if(!admin)list=list.filter(o=>o.status==="Perdido");if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
 function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
-function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value;const results=objects.filter(o=>`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
+function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value,admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();const results=objects.filter(o=>(admin||publicSearchMode||o.status==="Perdido")&&`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
 function markFound(id){const o=objects.find(x=>x.id===id);if(!o)return;o.status="Encontrado";addHistory(o,"El objeto fue marcado como encontrado.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como encontrado.` ,"success");viewDetails(id)}
 function markRecovered(id){const o=objects.find(x=>x.id===id);if(!o)return;if(o.status!=="Encontrado"){showToast("El objeto debe estar encontrado primero.","error");return}if(!confirm(`¿Confirmas que "${o.name}" fue entregado a su dueño?`))return;o.status="Recuperado";addHistory(o,"El objeto fue entregado a su dueño.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como recuperado.` ,"success");viewDetails(id)}
 
