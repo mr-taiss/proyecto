@@ -1,6 +1,6 @@
 /* SISGOP - gestion de objetos perdidos */
 const STORAGE_KEY="sisgop_objects";
-let objects=[],editingId=null,currentFilter="Todos",currentImage="";
+let objects=[],editingId=null,currentFilter="Todos",currentImage="",publicSearchMode=false;
 
 const OBJECT_OPTIONS={
   "Prendas":["Chompa","Polera","Pantalón","Falda","Camisa","Chaqueta","Abrigo","Gorra","Medias","Bufanda"],
@@ -28,6 +28,24 @@ function showScreen(id){document.querySelectorAll(".page").forEach(p=>p.classLis
 function enterSystem(){updateAll();showScreen("homeScreen")}
 function returnToWelcome(){showScreen("welcomeScreen")}
 function openHome(){updateAll();showScreen("homeScreen")}
+function openPublicSearch(){
+  publicSearchMode=true;
+  const input=document.getElementById('searchInput'),status=document.getElementById('searchStatus'),back=document.getElementById('searchBackButton');
+  if(input)input.value=''; if(status)status.value='Todos'; if(back)back.textContent='← Volver a portada';
+  searchObjects();showScreen('searchScreen');
+}
+function openStudentProfile(){
+  const user=typeof window.currentSISGOPUser==='function'?window.currentSISGOPUser():null;
+  if(!user){if(typeof window.showSISGOPLogin==='function')window.showSISGOPLogin();return;}
+  const mine=objects.filter(o=>o.owner===user.name),content=document.getElementById('profileContent');if(!content)return;
+  let html='<div class="profile-summary"><h2>'+escapeHTML(user.name)+'</h2><p><strong>Curso:</strong> '+escapeHTML(user.course||'6B')+'</p><p><strong>Objetos registrados:</strong> '+mine.length+'</p></div><div class="profile-history"><h3>Mis registros e historial</h3>';
+  if(!mine.length)html+='<p>Todavía no registraste objetos con esta cuenta.</p>';
+  mine.forEach(o=>{html+='<article class="history-item"><strong>'+escapeHTML(o.name)+'</strong> · '+escapeHTML(o.status)+'<p>'+escapeHTML(o.place)+' · '+formatDate(o.date)+'</p>';(o.history||[]).forEach(h=>{html+='<p>'+escapeHTML(h.date)+' — '+escapeHTML(h.message)+'</p>';});html+='</article>';});
+  content.innerHTML=html+'</div>';showScreen('profileScreen');
+}
+function openAdminAccess(){
+  alert('El acceso administrativo necesita autenticación y permisos verificados en un servidor. Este prototipo guarda los datos en el navegador; falta configurar un backend con base de datos y roles para habilitar un panel administrativo seguro.');
+}
 function openRegister(){resetForm();showScreen("registerScreen")}
 function openSearch(){document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";searchObjects();showScreen("searchScreen")}
 function openObjects(){currentFilter="Todos";document.querySelectorAll(".filter-button").forEach(b=>b.classList.remove("active"));const f=document.querySelector(".filter-button");if(f)f.classList.add("active");renderObjects();showScreen("objectsScreen")}
@@ -67,7 +85,7 @@ function setupStudentRecognition(){
     if(!input.value.trim()){input.setCustomValidity("");return}
     const recognized=recognizeStudent(input.value);
     if(recognized){input.value=recognized;input.setCustomValidity("")}
-    else{input.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to A.");}
+    else{input.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to B.");}
   });
   input.addEventListener("input",()=>{input.setCustomValidity("")});
 }
@@ -88,7 +106,7 @@ function saveObject(e){
   const student=recognizeStudent(studentText);
 
   if(!status||!category||!name||!description||!date||!place){showToast("Completa todos los campos obligatorios.","error");return}
-  if(studentText&&!student){studentInput.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to A.");studentInput.reportValidity();showToast("El estudiante no está registrado.","error");return}
+  if(studentText&&!student){studentInput.setCustomValidity("El estudiante no está registrado. Escribe un nombre válido de 6to B.");studentInput.reportValidity();showToast("El estudiante no está registrado.","error");return}
   studentInput.value=student||"";studentInput.setCustomValidity("");
 
   if(editingId!==null){const o=objects.find(x=>x.id===editingId);if(!o)return;o.status=status;o.category=category;o.name=name;o.description=description;o.date=date;o.place=place;o.student=student||"";if(currentImage)o.image=currentImage;addHistory(o,"Información del objeto editada.");saveObjects();updateAll();showToast("Objeto actualizado correctamente.","success");openObjects();return}
@@ -101,14 +119,21 @@ function updateAll(){updateStatistics();renderObjects();searchObjects();renderNo
 function updateStatistics(){const l=objects.filter(o=>o.status==="Perdido").length,f=objects.filter(o=>o.status==="Encontrado").length,r=objects.filter(o=>o.status==="Recuperado").length;document.getElementById("lostCount").textContent=l;document.getElementById("foundCount").textContent=f;document.getElementById("recoveredCount").textContent=r;const n=f,b=document.getElementById("notificationBadge");b.textContent=n;b.classList.toggle("zero",n===0)}
 function statusHTML(s){const c=s==="Perdido"?"perdido":s==="Encontrado"?"encontrado":"recuperado",sym=s==="Perdido"?"•":s==="Encontrado"?"✓":"↗";return `<span class="status ${c}">${sym} ${s}</span>`}
 function formatDate(d){if(!d)return"-";const p=d.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
-function createTableRow(o){let a=`<button class="table-action" onclick="viewDetails('${o.id}')">Ver</button>`;if(o.status==="Perdido")a+=`<button class="table-action found" onclick="markFound('${o.id}')">Encontrado</button>`;if(o.status==="Encontrado")a+=`<button class="table-action recover" onclick="markRecovered('${o.id}')">Recuperado</button>`;a+=`<button class="table-action edit" onclick="editObject('${o.id}')">Editar</button><button class="table-action delete" onclick="deleteObject('${o.id}')">Eliminar</button>`;return `<tr><td>${escapeHTML(o.id)}</td><td><strong>${escapeHTML(o.name)}</strong></td><td>${formatDate(o.date)}</td><td>${escapeHTML(o.place)}</td><td>${statusHTML(o.status)}</td><td>${a}</td></tr>`}
+function createTableRow(o){
+  let a='<button class="table-action" onclick="viewDetails(\''+o.id+'\')">Ver</button>';
+  if(publicSearchMode)return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+  if(o.status==='Perdido')a+='<button class="table-action found" onclick="markFound(\''+o.id+'\')">Encontrado</button>';
+  if(o.status==='Encontrado')a+='<button class="table-action recover" onclick="markRecovered(\''+o.id+'\')">Recuperado</button>';
+  a+='<button class="table-action edit" onclick="editObject(\''+o.id+'\')">Editar</button><button class="table-action delete" onclick="deleteObject(\''+o.id+'\')">Eliminar</button>';
+  return '<tr><td>'+escapeHTML(o.id)+'</td><td><strong>'+escapeHTML(o.name)+'</strong></td><td>'+formatDate(o.date)+'</td><td>'+escapeHTML(o.place)+'</td><td>'+statusHTML(o.status)+'</td><td>'+a+'</td></tr>';
+}
 function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;let list=[...objects];if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
 function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
 function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value;const results=objects.filter(o=>`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
 function markFound(id){const o=objects.find(x=>x.id===id);if(!o)return;o.status="Encontrado";addHistory(o,"El objeto fue marcado como encontrado.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como encontrado.` ,"success");viewDetails(id)}
 function markRecovered(id){const o=objects.find(x=>x.id===id);if(!o)return;if(o.status!=="Encontrado"){showToast("El objeto debe estar encontrado primero.","error");return}if(!confirm(`¿Confirmas que "${o.name}" fue entregado a su dueño?`))return;o.status="Recuperado";addHistory(o,"El objeto fue entregado a su dueño.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como recuperado.` ,"success");viewDetails(id)}
 
-function viewDetails(id){const o=objects.find(x=>x.id===id);if(!o)return;let image=o.image?`<img src="${o.image}" alt="Objeto">`:`<div class="detail-placeholder">◇</div>`,actions="";if(o.status==="Perdido")actions+=`<button class="detail-button found" onclick="markFound('${id}')">Marcar encontrado</button>`;if(o.status==="Encontrado")actions+=`<button class="detail-button recover" onclick="markRecovered('${id}')">Marcar recuperado</button>`;actions+=`<button class="detail-button edit" onclick="editObject('${id}')">Editar</button><button class="detail-button delete" onclick="deleteObject('${id}')">Eliminar</button><button class="detail-button back" onclick="openObjects()">Volver</button>`;const h=o.history||[];document.getElementById("detailContent").innerHTML=`<div class="detail-grid"><div><div class="detail-image">${image}</div></div><div class="detail-info"><div class="detail-row"><strong>ID</strong><span>${escapeHTML(o.id)}</span></div><div class="detail-row"><strong>Tipo</strong><span>${escapeHTML(o.category||"No especificado")}</span></div><div class="detail-row"><strong>Objeto</strong><span>${escapeHTML(o.name)}</span></div><div class="detail-row"><strong>Descripción</strong><span>${escapeHTML(o.description)}</span></div><div class="detail-row"><strong>Fecha</strong><span>${formatDate(o.date)}</span></div><div class="detail-row"><strong>Lugar</strong><span>${escapeHTML(o.place)}</span></div><div class="detail-row"><strong>Estudiante</strong><span>${escapeHTML(o.student||"No especificado")}</span></div><div class="detail-row"><strong>Estado</strong><span>${statusHTML(o.status)}</span></div></div></div><div class="detail-actions">${actions}</div><div class="history"><h3>Historial del registro</h3>${h.length?h.map(x=>`<div class="history-item">${escapeHTML(x.date)} — ${escapeHTML(x.message)}</div>`).join(""):"Sin historial."}</div>`;showScreen("detailScreen")}
+function viewDetails(id){const o=objects.find(x=>x.id===id);if(!o)return;let image=o.image?`<img src="${o.image}" alt="Objeto">`:`<div class="detail-placeholder">◇</div>`,actions="";if(publicSearchMode){actions=`<button class="detail-button back" onclick="returnToWelcome()">Volver a la portada</button>`;}else{if(o.status==="Perdido")actions+=`<button class="detail-button found" onclick="markFound('${id}')">Marcar encontrado</button>`;if(o.status==="Encontrado")actions+=`<button class="detail-button recover" onclick="markRecovered('${id}')">Marcar recuperado</button>`;actions+=`<button class="detail-button edit" onclick="editObject('${id}')">Editar</button><button class="detail-button delete" onclick="deleteObject('${id}')">Eliminar</button><button class="detail-button back" onclick="openObjects()">Volver</button>`;}const h=o.history||[];document.getElementById("detailContent").innerHTML=`<div class="detail-grid"><div><div class="detail-image">${image}</div></div><div class="detail-info"><div class="detail-row"><strong>ID</strong><span>${escapeHTML(o.id)}</span></div><div class="detail-row"><strong>Tipo</strong><span>${escapeHTML(o.category||"No especificado")}</span></div><div class="detail-row"><strong>Objeto</strong><span>${escapeHTML(o.name)}</span></div><div class="detail-row"><strong>Descripción</strong><span>${escapeHTML(o.description)}</span></div><div class="detail-row"><strong>Fecha</strong><span>${formatDate(o.date)}</span></div><div class="detail-row"><strong>Lugar</strong><span>${escapeHTML(o.place)}</span></div><div class="detail-row"><strong>Estudiante</strong><span>${escapeHTML(o.student||"No especificado")}</span></div><div class="detail-row"><strong>Estado</strong><span>${statusHTML(o.status)}</span></div></div></div><div class="detail-actions">${actions}</div>${publicSearchMode?"":`<div class="history"><h3>Historial del registro</h3>${h.length?h.map(x=>`<div class="history-item">${escapeHTML(x.date)} — ${escapeHTML(x.message)}</div>`).join(""):"Sin historial."}</div>`}`;showScreen("detailScreen")}
 
 function editObject(id){const o=objects.find(x=>x.id===id);if(!o)return;editingId=id;document.getElementById("formTitle").textContent="Editar objeto";document.getElementById("objectStatus").value=o.status==="Recuperado"?"Encontrado":o.status;const category=o.category||findCategoryByName(o.name)||"";document.getElementById("objectCategory").value=category;populateObjectNames(category,o.name);document.getElementById("objectDescription").value=o.description;document.getElementById("objectDate").value=o.date;document.getElementById("objectPlace").value=o.place;document.getElementById("studentName").value=o.student||"";document.getElementById("studentName").setCustomValidity("");currentImage=o.image||"";if(o.image){const p=document.getElementById("imagePreview");p.innerHTML=`<img src="${o.image}" alt="Objeto">`;p.classList.add("visible")}showScreen("registerScreen")}
 function deleteObject(id){const o=objects.find(x=>x.id===id);if(!o)return;if(!confirm(`¿Eliminar "${o.name}"?`))return;objects=objects.filter(x=>x.id!==id);saveObjects();updateAll();showToast("Objeto eliminado.","success");openObjects()}

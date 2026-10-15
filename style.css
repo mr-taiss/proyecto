@@ -53,3 +53,6 @@
 .dashboard-intro span {
   color: #303B4D;
 }
+
+/* Accesos de portada y perfil personal */
+.welcome-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.welcome-links button{border:1px solid #cbd5e1;background:rgba(255,255,255,.78);color:#344d70;padding:10px 14px;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer}.welcome-links button:hover{background:#fff;border-color:#8298b5}.menu-card.profile{border-color:#cbd8e8;background:#f7faff}.profile-summary{padding:22px;margin-bottom:20px;border:1px solid var(--border);border-radius:12px;background:#fbfcfe}.profile-summary h2{color:var(--dark);margin-bottom:8px}.profile-summary p{margin:5px 0;color:var(--muted)}.profile-history{padding:18px 0;border-top:1px solid var(--border)}.profile-history h3{margin-bottom:10px;color:var(--dark)}
