@@ -30,6 +30,7 @@
   }
 
   function ownerCanModify(id) {
+    if (localStorage.getItem("sisgop_admin_session") === "1") return true;
     const user = currentUserName();
     if (!user) {
       if (typeof window.showSISGOPLogin === "function") window.showSISGOPLogin();
