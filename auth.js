@@ -12,6 +12,9 @@
   const readPasswords = () => { try { return JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}"); } catch { return {}; } };
   const COURSE_LABELS = {"1A":"1.º A","1B":"1.º B","1C":"1.º C","2A":"2.º A","2B":"2.º B","2C":"2.º C","3A":"3.º A","3B":"3.º B","4A":"4.º A","4B":"4.º B","5A":"5.º A · Exactas","5B":"5.º B · Salud","5C":"5.º C · Socio-Económicas","6A":"6.º A · Exactas","6B":"6.º B · Salud","6C":"6.º C · Socio-Económicas"};
   const COURSE_KEY = "sisgop_current_course";
+  const ADMIN_SESSION_KEY = "sisgop_admin_session";
+  const ADMIN_USERNAME = "admin";
+  const ADMIN_PASSWORD = "SISGOPADMIN26";
   const findUser = (value, course) => {
     const text = normalize(value);
     if (!text) return null;
@@ -25,6 +28,22 @@
   };
   const getPassword = user => readPasswords()[normalize(user.name)] || user.password;
   const hasChangedPassword = user => Object.prototype.hasOwnProperty.call(readPasswords(), normalize(user.name));
+
+  function showAdminLogin() {
+    const username = prompt("Acceso de administrador\\nUsuario:");
+    if (username === null) return;
+    const password = prompt("Contraseña de administrador:");
+    if (password === null) return;
+    if (username.trim() !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+      alert("Usuario o contraseña incorrectos.");
+      return;
+    }
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(COURSE_KEY);
+    localStorage.setItem(ADMIN_SESSION_KEY, "1");
+    document.getElementById("sisgopLoginOverlay")?.remove();
+    enterHome();
+  }
 
   function showLogin() {
     localStorage.removeItem(SESSION_KEY);
@@ -116,11 +135,22 @@
     document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
     document.getElementById("homeScreen")?.classList.add("active");
     const courseLabel = document.getElementById("activeCourseLabel");
-    if (courseLabel) courseLabel.textContent = COURSE_LABELS[localStorage.getItem(COURSE_KEY) || "6B"] || "SECUNDARIA";
+    const isAdmin = localStorage.getItem(ADMIN_SESSION_KEY) === "1";
+    if (courseLabel) courseLabel.textContent = isAdmin ? "ADMINISTRADOR" : (COURSE_LABELS[localStorage.getItem(COURSE_KEY) || "6B"] || "SECUNDARIA");
+    const profileCard = document.querySelector(".menu-card.profile");
+    if (profileCard) profileCard.style.display = isAdmin ? "none" : "";
+    const intro = document.querySelector("#homeScreen .dashboard-intro p");
+    if (intro) intro.textContent = isAdmin ? "Panel administrativo: consulta y gestiona todos los objetos registrados." : "Selecciona una de las opciones para gestionar los objetos del curso.";
     if (typeof window.updateAll === "function") window.updateAll();
   }
 
   function logout() {
+    if (localStorage.getItem(ADMIN_SESSION_KEY) === "1") {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+      document.getElementById("welcomeScreen")?.classList.add("active");
+      return;
+    }
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(COURSE_KEY);
     document.getElementById("sisgopPasswordOverlay")?.remove();
@@ -129,6 +159,7 @@
   }
 
   function ownerCanEdit(id) {
+    if (localStorage.getItem(ADMIN_SESSION_KEY) === "1") return true;
     const user = currentUser();
     if (!user) { showLogin(); return false; }
     let data = [];
@@ -173,6 +204,8 @@
   }
 
   window.showSISGOPLogin = showLogin;
+  window.showSISGOPAdminLogin = showAdminLogin;
+  window.isSISGOPAdmin = () => localStorage.getItem(ADMIN_SESSION_KEY) === "1";
   window.enterSystem = showLogin;
   window.loginSISGOP = login;
   window.logoutSISGOP = logout;
