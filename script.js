@@ -47,7 +47,7 @@ function openAdminAccess(){
   if(typeof window.showSISGOPAdminLogin==='function') window.showSISGOPAdminLogin();
   else alert('No se pudo cargar el acceso de administrador. Recarga la página.');
 }
-function openRegister(){resetForm();showScreen("registerScreen")}
+function openRegister(){resetForm();const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();const statusSelect=document.getElementById("objectStatus");if(statusSelect){const foundOption=Array.from(statusSelect.options).find(option=>option.value==="Encontrado");if(foundOption)foundOption.hidden=!admin;statusSelect.value="Perdido"}showScreen("registerScreen")}
 function openSearch(){document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";searchObjects();showScreen("searchScreen")}
 function openObjects(){currentFilter="Todos";document.querySelectorAll(".filter-button").forEach(b=>b.classList.remove("active"));const f=document.querySelector(".filter-button");if(f)f.classList.add("active");renderObjects();showScreen("objectsScreen")}
 function openNotifications(){renderNotifications();showScreen("notificationsScreen")}
