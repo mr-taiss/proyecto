@@ -136,8 +136,17 @@ function createTableRow(o){
   return `<tr><td>${id}</td><td><strong>${name}</strong></td><td>${formatDate(o.date)}</td><td>${escapeHTML(o.place)}</td><td>${statusHTML(o.status)}</td><td>${actions}</td></tr>`;
 }
 function renderObjects(){const t=document.getElementById("objectsTableBody");if(!t)return;const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();let list=[...objects];if(!admin)list=list.filter(o=>o.status==="Perdido");if(currentFilter!=="Todos")list=list.filter(o=>o.status===currentFilter);t.innerHTML=list.length?list.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No hay objetos registrados.</td></tr>`}
-function filterObjects(f,b){currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
-function searchObjects(){const i=document.getElementById("searchInput"),s=document.getElementById("searchStatus"),t=document.getElementById("searchTableBody");if(!i||!s||!t)return;const text=i.value.trim().toLowerCase(),selected=s.value,admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();const results=objects.filter(o=>(admin||o.status==="Perdido")&&`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));t.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`}
+function filterObjects(f,b){const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();if(!admin&&["Encontrado","Recuperado"].includes(f)){currentFilter="Todos";return}currentFilter=f;document.querySelectorAll(".filter-button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderObjects()}
+function searchObjects(){
+  const input=document.getElementById("searchInput"),status=document.getElementById("searchStatus"),table=document.getElementById("searchTableBody");
+  if(!input||!status||!table)return;
+  const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();
+  Array.from(status.options).forEach(option=>{option.hidden=!admin&&["Encontrado","Recuperado"].includes(option.value)});
+  if(!admin&&["Encontrado","Recuperado"].includes(status.value))status.value="Todos";
+  const text=input.value.trim().toLowerCase(),selected=status.value;
+  const results=objects.filter(o=>(admin||o.status==="Perdido")&&`${o.name} ${o.category||""} ${o.place} ${o.description} ${o.student||""}`.toLowerCase().includes(text)&&(selected==="Todos"||o.status===selected));
+  table.innerHTML=results.length?results.map(createTableRow).join(""):`<tr><td colspan="6" class="empty-message">No se encontraron objetos.</td></tr>`;
+}
 function markFound(id){if(!(typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin())){showToast("Solo el administrador puede cambiar el estado del objeto.","error");return}const o=objects.find(x=>x.id===id);if(!o)return;o.status="Encontrado";addHistory(o,"El objeto fue marcado como encontrado.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como encontrado.` ,"success");viewDetails(id)}
 function markRecovered(id){if(!(typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin())){showToast("Solo el administrador puede cambiar el estado del objeto.","error");return}const o=objects.find(x=>x.id===id);if(!o)return;if(o.status!=="Encontrado"){showToast("El objeto debe estar encontrado primero.","error");return}if(!confirm(`¿Confirmas que "${o.name}" fue entregado a su dueño?`))return;o.status="Recuperado";addHistory(o,"El objeto fue entregado a su dueño.");saveObjects();updateAll();showToast(`"${o.name}" fue marcado como recuperado.` ,"success");viewDetails(id)}
 
