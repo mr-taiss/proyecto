@@ -10,3 +10,20 @@
 #sisgopUserBadge button:last-child{color:#9b5555!important;background:#f9eeee!important}
 #sisgopUserBadge button:last-child:hover{background:#f5dddd!important;color:#843f3f!important}
 @media(max-width:650px){#sisgopUserBadge{top:10px!important;right:10px!important;max-width:calc(100vw - 20px)!important;padding:9px 11px!important;gap:6px!important}#sisgopUserBadge strong{width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important}#sisgopUserBadge button{padding:6px 8px!important}}
+
+
+/* Fondo fotográfico oficial de Don Bosco Sucre para SISGOP */
+#welcomeScreen,
+#homeScreen,
+.internal-page {
+  background-image:
+    linear-gradient(rgba(12, 25, 48, 0.48), rgba(12, 25, 48, 0.58)),
+    url("https://donboscosucre.edu.bo/_next/image?q=75&url=%2Fimgs%2FNews-Destacados-Abanderados.webp&w=1920") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+.application {
+  background: rgba(255, 255, 255, 0.92);
+}
