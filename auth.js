@@ -18,8 +18,12 @@
   const findUser = (value, course) => {
     const text = normalize(value);
     if (!text) return null;
-    const exact = USERS.find(user => normalize(user.name) === text && (!course || user.course === course));
-    return exact || null;
+    const eligible = USERS.filter(user => !course || user.course === course);
+    const exact = eligible.find(user => normalize(user.name) === text);
+    if (exact) return exact;
+    const sortedWords = value => normalize(value).split(" ").filter(Boolean).sort().join(" ");
+    const reordered = eligible.filter(user => sortedWords(user.name) === sortedWords(text));
+    return reordered.length === 1 ? reordered[0] : null;
   };
   const currentUser = () => {
     const saved = localStorage.getItem(SESSION_KEY);
