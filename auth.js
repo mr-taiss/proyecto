@@ -8,7 +8,7 @@
   const PASSWORDS_KEY = "sisgop_changed_passwords";
   const OBJECTS_KEY = "sisgop_objects";
 
-  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-ZÑ ]/g, " ").replace(/\s+/g, " ").trim();
+  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleUpperCase("es").replace(/[^A-ZÑ ]/g, " ").replace(/\s+/g, " ").trim();
   const readPasswords = () => { try { return JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}"); } catch { return {}; } };
   const COURSE_LABELS = {"1A":"1.º A","1B":"1.º B","1C":"1.º C","2A":"2.º A","2B":"2.º B","2C":"2.º C","3A":"3.º A","3B":"3.º B","4A":"4.º A","4B":"4.º B","5A":"5.º A · Exactas","5B":"5.º B · Salud","5C":"5.º C · Socio-Económicas","6A":"6.º A · Exactas","6B":"6.º B · Salud","6C":"6.º C · Socio-Económicas"};
   const COURSE_KEY = "sisgop_current_course";
