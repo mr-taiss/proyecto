@@ -68,7 +68,7 @@ function findCategoryByName(name){for(const category of Object.keys(OBJECT_OPTIO
 
 function normalizeStudentName(value){return String(value||"").trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ")}
 function recognizeStudent(value){
-  const entered=String(value||"").trim().replace(/\\s+/g," ");
+  const entered=String(value||"").trim().replace(/\s+/g," ");
   const normalized=normalizeStudentName(entered);
   if(!normalized)return null;
   const exact=AUTHORIZED_STUDENTS.find(name=>normalizeStudentName(name)===normalized);
