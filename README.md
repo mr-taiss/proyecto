@@ -1,11 +1,11 @@
 # SISGOP — Sistema de Gestión de Objetos Perdidos
 
-Aplicación web para el registro, búsqueda y recuperación de objetos perdidos del 6to B del Colegio Don Bosco.
+Aplicación web para el registro, búsqueda y recuperación de objetos perdidos para estudiantes de 1.º A a 6.º C del Colegio Don Bosco.
 
 ## Funciones principales
 
 - Inicio de sesión mediante nombre autorizado y contraseña.
-- 37 estudiantes autorizados.
+- 659 estudiantes autorizados, validados por curso y especialidad.
 - Cambio de contraseña después del primer acceso.
 - Cierre de sesión independiente del cambio de contraseña.
 - Registro de objetos perdidos o encontrados.
