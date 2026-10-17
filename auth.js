@@ -666,28 +666,51 @@
   const PASSWORDS_KEY = "sisgop_changed_passwords";
   const OBJECTS_KEY = "sisgop_objects";
 
-  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleUpperCase("es").replace(/[^A-ZÑ ]/g, " ").replace(/\s+/g, " ").trim();
+  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleUpperCase("es").replace(/[^A-Z ]/g, " ").replace(/\s+/g, " ").trim();
   const readPasswords = () => { try { return JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}"); } catch { return {}; } };
   const COURSE_LABELS = {"1A":"1.º A","1B":"1.º B","1C":"1.º C","2A":"2.º A","2B":"2.º B","2C":"2.º C","3A":"3.º A","3B":"3.º B","4A":"4.º A","4B":"4.º B","5A":"5.º A · Exactas","5B":"5.º B · Salud","5C":"5.º C · Socio-Económicas","6A":"6.º A · Exactas","6B":"6.º B · Salud","6C":"6.º C · Socio-Económicas"};
   const COURSE_KEY = "sisgop_current_course";
   const ADMIN_SESSION_KEY = "sisgop_admin_session";
   const ADMIN_USERNAME = "admin";
   const ADMIN_PASSWORD = "SISGOPADMIN26";
+  const nameWords = value => normalize(value).split(" ").filter(Boolean);
+  const sortedWords = value => nameWords(value).sort().join(" ");
+  const oneLetterTypoAway = (a, b) => {
+    if (Math.abs(a.length - b.length) > 1) return false;
+    if (a.length === b.length) {
+      let differences = 0;
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i] && ++differences > 1) return false;
+      return true;
+    }
+    const shorter = a.length < b.length ? a : b;
+    const longer = a.length < b.length ? b : a;
+    let i = 0, j = 0, skipped = 0;
+    while (i < shorter.length && j < longer.length) {
+      if (shorter[i] === longer[j]) { i++; j++; }
+      else { if (++skipped > 1) return false; j++; }
+    }
+    return true;
+  };
   const findUser = (value, course) => {
     const text = normalize(value);
     if (!text) return null;
     const eligible = USERS.filter(user => !course || user.course === course);
     const exact = eligible.find(user => normalize(user.name) === text);
     if (exact) return exact;
-    const sortedWords = value => normalize(value).split(" ").filter(Boolean).sort().join(" ");
     const reordered = eligible.filter(user => sortedWords(user.name) === sortedWords(text));
     if (reordered.length === 1) return reordered[0];
-    // Permite buscar por nombre, apellido o varios fragmentos sin exigir el nombre completo.
-    // Si el fragmento coincide con más de un estudiante, no elige uno al azar.
-    const tokens = text.split(" ").filter(Boolean);
+
+    // Acepta nombre completo en cualquier orden, nombres/apellidos parciales,
+    // diferencias de acentos y un pequeño error de escritura. Solo entra si
+    // la búsqueda identifica a una única persona del curso seleccionado.
+    const tokens = nameWords(text);
     const partial = eligible.filter(user => {
-      const nameTokens = normalize(user.name).split(" ").filter(Boolean);
-      return tokens.every(token => nameTokens.some(nameToken => nameToken.includes(token)));
+      const registered = nameWords(user.name);
+      return tokens.every(token => registered.some(word =>
+        word === token ||
+        (token.length >= 2 && (word.startsWith(token) || word.includes(token))) ||
+        (token.length >= 5 && oneLetterTypoAway(token, word))
+      ));
     });
     return partial.length === 1 ? partial[0] : null;
   };
