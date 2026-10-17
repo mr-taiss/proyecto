@@ -63,7 +63,7 @@ function setToday(){const i=document.getElementById("objectDate");if(!i)return;c
 function setupForm(){const f=document.getElementById("objectForm");if(f)f.addEventListener("submit",saveObject)}
 
 function setupObjectSelectors(){const category=document.getElementById("objectCategory");if(category)category.addEventListener("change",()=>populateObjectNames(category.value));populateObjectNames("")}
-function populateObjectNames(category,selectedName=""){const select=document.getElementById("objectName");if(!select)return;const options=OBJECT_OPTIONS[category]||[];if(!category){select.innerHTML='<option value="">Primero selecciona un tipo de objeto</option>';select.disabled=true;return}select.disabled=false;select.innerHTML='<option value="">Selecciona un nombre (obligatorio)</option>'+options.map(name=>`<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join("");if(selectedName&&options.includes(selectedName))select.value=selectedName}
+function populateObjectNames(category,selectedName=""){const select=document.getElementById("objectName");if(!select)return;const options=OBJECT_OPTIONS[category]||[];if(!category){select.innerHTML='<option value="">Primero selecciona un tipo de objeto</option>';select.disabled=true;return}select.disabled=false;select.innerHTML='<option value="">Selecciona un objeto (obligatorio)</option>'+options.map(name=>`<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join("");if(selectedName&&options.includes(selectedName))select.value=selectedName}
 function findCategoryByName(name){for(const category of Object.keys(OBJECT_OPTIONS)){if(OBJECT_OPTIONS[category].includes(name))return category}return ""}
 
 function normalizeStudentName(value){return String(value||"").trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ")}
@@ -115,7 +115,7 @@ function saveObject(e){
   e.preventDefault();
   const admin=typeof window.isSISGOPAdmin==="function"&&window.isSISGOPAdmin();
   const user=typeof window.currentSISGOPUser==="function"?window.currentSISGOPUser():null;
-  const status=admin&&document.getElementById("objectStatus")?document.getElementById("objectStatus").value:"Perdido";
+  const status=admin&&document.getElementById("objectStatus")?document.getElementById("objectStatus").value:(editingId!==null?(objects.find(x=>x.id===editingId)?.status||"Perdido"):"Perdido");
   const category=document.getElementById("objectCategory").value;
   const name=document.getElementById("objectName").value.trim();
   const description=document.getElementById("objectDescription").value.trim();
