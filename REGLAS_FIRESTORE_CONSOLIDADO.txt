@@ -1,0 +1,55 @@
+// Reglas de PRUEBA aislada. Conservar firebase_diagnostico y objetos_prueba.
+// Administradores adicionales: solo los puede autorizar un administrador autenticado.
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signed() { return request.auth != null; }
+  function hasProfile() { return signed() && exists(/databases/$(database)/documents/perfiles_prueba/$(request.auth.uid)); }
+  function role() { return get(/databases/$(database)/documents/perfiles_prueba/$(request.auth.uid)).data.rol; }
+  function isAdmin() { return hasProfile() && role() == 'admin'; }
+  function student() { return hasProfile() && role() == 'estudiante'; }
+  function activeProfile() { return hasProfile() && (role() == 'admin' || (role() == 'estudiante' && get(/databases/$(database)/documents/perfiles_prueba/$(request.auth.uid)).data.get('requiereCambioClave', false) != true)); }
+  match /firebase_diagnostico/{uid} { allow read,write: if signed() && request.auth.uid == uid; }
+  match /objetos_prueba/{uid}/items/{id} {
+   function owner(){return signed() && request.auth.uid == uid;}
+   function valid(){return request.resource.data.keys().hasOnly(['nombre','lugar','estado','creado']) && request.resource.data.keys().hasAll(['nombre','lugar','estado','creado']) && request.resource.data.nombre is string && request.resource.data.nombre.size()>0 && request.resource.data.nombre.size()<=80 && request.resource.data.lugar is string && request.resource.data.lugar.size()>0 && request.resource.data.lugar.size()<=80 && request.resource.data.estado in ['Perdido','Encontrado','Recuperado'];}
+   allow get,list: if owner();
+   allow create: if owner() && valid() && request.resource.data.creado == request.time;
+   allow update: if owner() && valid() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado']) && request.resource.data.creado == resource.data.creado;
+   allow delete: if owner();
+  }
+  match /perfiles_prueba/{uid} {
+   allow get: if signed() && (request.auth.uid == uid || activeProfile());
+   allow list,delete: if false;
+   allow update: if signed() && request.auth.uid == uid
+     && resource.data.rol == 'estudiante'
+     && resource.data.get('requiereCambioClave', false) == true
+     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['requiereCambioClave'])
+     && request.resource.data.requiereCambioClave == false;
+   allow create: if isAdmin()
+     && request.resource.data.keys().hasOnly(['alias','curso','rol'])
+     && request.resource.data.keys().hasAll(['alias','curso','rol'])
+     && request.resource.data.rol == 'admin'
+     && request.resource.data.curso == ''
+     && request.resource.data.alias is string
+     && request.resource.data.alias.size() >= 3
+     && request.resource.data.alias.size() <= 80;
+   allow create: if signed() && request.auth.uid == uid
+    && request.resource.data.keys().hasOnly(['alias','curso','rol'])
+    && request.resource.data.keys().hasAll(['alias','curso','rol'])
+    && request.resource.data.rol == 'estudiante'
+    && request.resource.data.alias is string && request.resource.data.alias.size() >= 3 && request.resource.data.alias.size() <= 100
+    && request.resource.data.curso in ['1A','1B','1C','2A','2B','2C','3A','3B','4A','4B','5A','5B','5C','6A','6B','6C'];
+  }
+  match /objetos_compartidos_prueba/{itemId} {
+   function valid(){return request.resource.data.keys().hasOnly(['nombre','lugar','estado','creadorUid','creado','categoria','descripcion','fechaEvento','curso','imageData']) && request.resource.data.keys().hasAll(['nombre','lugar','estado','creadorUid','creado','categoria','descripcion','fechaEvento','curso']) && request.resource.data.nombre is string && request.resource.data.nombre.size()>0 && request.resource.data.nombre.size()<=80 && request.resource.data.lugar is string && request.resource.data.lugar.size()>0 && request.resource.data.lugar.size()<=80 && request.resource.data.estado in ['Perdido','Encontrado','Recuperado'] && request.resource.data.categoria is string && request.resource.data.categoria.size()>0 && request.resource.data.categoria.size()<=80 && request.resource.data.descripcion is string && request.resource.data.descripcion.size()>0 && request.resource.data.descripcion.size()<=500 && request.resource.data.fechaEvento is string && request.resource.data.fechaEvento.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && request.resource.data.curso is string && request.resource.data.curso.size()<=12 && (!('imageData' in request.resource.data) || (request.resource.data.imageData is string && request.resource.data.imageData.size() <= 200000 && request.resource.data.imageData.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'))) && request.resource.data.creadorUid == request.auth.uid && request.resource.data.creado == request.time;}
+   // Publico solo puede consultar documentos cuyo estado sea Perdido.
+   // El cliente debe consultar con where('estado','==','Perdido').
+   allow get,list: if activeProfile() || resource.data.estado == 'Perdido';
+   allow create: if activeProfile() && (isAdmin() || student()) && valid() && (isAdmin() || request.resource.data.estado == 'Perdido');
+   allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado']) && request.resource.data.estado in ['Perdido','Encontrado','Recuperado'];
+   allow delete: if isAdmin();
+  }
+  match /{document=**} {allow read,write: if false;}
+ }
+}

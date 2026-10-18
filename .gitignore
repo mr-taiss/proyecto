@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Configuracion local de Firebase para pruebas
+dev/firebase-config.local.js
+
+dev/sisgop-firebase-accounts.local.js

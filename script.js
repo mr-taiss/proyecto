@@ -49,8 +49,8 @@ function openAdminAccess(){
 }
 function configureStatusField(){const statusSelect=document.getElementById("objectStatus");if(statusSelect){const field=statusSelect.closest(".form-group");if(field)field.style.display="none";}}
 function openRegister(){resetForm();configureStatusField();showScreen("registerScreen")}
-function openSearch(){publicSearchMode=false;document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";searchObjects();showScreen("searchScreen")}
-function openObjects(){publicSearchMode=false;currentFilter="Todos";document.querySelectorAll(".filter-button").forEach(b=>b.classList.remove("active"));const f=document.querySelector(".filter-button");if(f)f.classList.add("active");renderObjects();showScreen("objectsScreen")}
+function openSearch(){publicSearchMode=false;document.getElementById("searchInput").value="";document.getElementById("searchStatus").value="Todos";document.getElementById("searchBackButton").textContent="← Volver al menú";searchObjects();showScreen("searchScreen")}
+function openObjects(){if(publicSearchMode){openPublicSearch();return;}searchObjects();showScreen("searchScreen")}
 function openNotifications(){renderNotifications();showScreen("notificationsScreen")}
 
 function loadObjects(){
