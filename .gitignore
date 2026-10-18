@@ -27,3 +27,9 @@ dist-ssr
 dev/firebase-config.local.js
 
 dev/sisgop-firebase-accounts.local.js
+
+# Credenciales administrativas: siempre externas al repositorio
+**/*firebase-adminsdk*.json
+**/*service-account*.json
+*.pem
+*.key
